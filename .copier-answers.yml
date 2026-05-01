@@ -1,0 +1,24 @@
+# Changes here will be overwritten by Copier
+_commit: 4bfa269
+_src_path: gh:34j/pypackage-template
+add_me_as_contributor: true
+copyright_year: '2025'
+documentation: true
+email: 34j.95a2p@simplelogin.com
+full_name: 34j
+github_app_installation_ids: ''
+github_username: ultrasphere-dev
+has_cli: false
+initial_commit: true
+is_django_package: false
+open_source_license: MIT
+open_with_editor: true
+package_name: ie_circle
+project_name: ie-circle
+project_short_description: Solve linear integral equations with singular kernels on
+    circles, optionally with numerical verification
+project_slug: ie-circle
+run_uv_sync: true
+setup_github: true
+setup_pre_commit: true
+
