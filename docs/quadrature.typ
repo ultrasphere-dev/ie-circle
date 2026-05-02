@@ -28,7 +28,8 @@ $
   $
 ]
 
-- Integral equations coming from common partial differential equations in $RR^2$ often involve singular integrals, derivative of integrals.
+- Integral equations coming from common partial differential equations in $SS^1$ ($RR^2$) often involve singular integrals, derivative of integrals.
+- To compute these integrals, exact values of integrals of Fourier basis functions are needed.
 - To deal with the singularity while maintaining $2 pi$-periodicity, we need a function which only has singularity at $0 (2 pi)$ and is $2 pi$-periodic.
   - $csc^n t, cot^n t, n in NN$: singularities at $pi$ as well
   - $csc^n t/2, n in.not 2 NN$: not $2 pi$-periodic
@@ -172,6 +173,8 @@ $
 
 == Quadratures
 
+Now we consider the way to express discrete Fourier expansion of a function in $U_N$ using the values of the function at $ts, ts + (2 pi)/N', ts + (4 pi)/N', ...$.
+
 #lemma[
   $forall N in NN. forall f in U_N. N := 2 N - 1. t_j := (2 pi j)/N'. forall ts in [0, 2 pi).$
   $
@@ -185,6 +188,8 @@ $
          & = sum_(j = 0)^(N'-1) f(t_j + ts) dot (1/N' sum_(abs(m) < N) e^(- i m (t_j + ts)) e^(i m x))
   $
 ]
+
+Combining the above lemma with the exact integral values of Fourier basis functions, we can exactly compute the integrals of functions in $U_N$ multiplied by $cot^n (t/2)$ or $log(4 sin^2 (t/2)) cot^n (t/2)$, by using only the values of the function at $ts, ts + (2 pi)/N', ts + (4 pi)/N', ...$.
 
 #theorem[Generalized Garrick--Wittich quadrature for $U_N$][
   $forall n in NN_0. forall N in NN. forall f in U_N. N' := 2 N - 1. t_j := (2 pi j)/N'. forall ts in [0, 2 pi).$
@@ -202,6 +207,16 @@ $
   $
   $
   Q_j^(N',n) := 1/N' sum_(abs(m) < N) J_(m,n) e^(- i m (t_j + ts))
+  $
+]
+
+== Error estimates
+
+= Integral Equations
+
+#theorem[
+  $
+  phi(s) + sum_(n = 0)^M integral.dash_0^(2 pi) K_n (s, t) cot^n ((s - t)/2) phi(t) dd(t) + sum_(n = 0)^M integral.dash_0^(2 pi) L_n (s, t) log(4 sin^2 ((s - t)/2)) cot^n ((s - t)/2) phi(t) dd(t) = f(s)
   $
 ]
 
