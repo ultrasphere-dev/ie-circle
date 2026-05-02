@@ -26,6 +26,7 @@ classifiers = [
 dependencies = [
   "array-api-compat>=1.14",
   "attrs>=26.1",
+  "numpy>=2.4.4",
   "sympy>=1.14",
   "types-array-api>=1.1.4",
 ]
@@ -40,6 +41,7 @@ dev = [
   "pytest==9.*",
   "pytest-cov==7.*",
   "sybil[pytest]",
+  "torch>=2.11",
   "ty>=0.0.34",
 ]
 docs = [
