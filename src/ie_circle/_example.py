@@ -2,8 +2,28 @@ import math
 from typing import Any
 
 from array_api._2024_12 import Array, ArrayNamespaceFull
+from array_api_compat import array_namespace
 
 from ._bie import NystromInterpolant, QuadratureType, nystrom
+
+
+def example_13_19_answer(t: Array, /) -> Array:
+    r"""
+    Returns the exact solution of the example integral equation.
+
+    Parameters
+    ----------
+    t : Array
+        The evaluation points of shape (...,).
+
+    Returns
+    -------
+    Array
+        The exact solution $\phi(t) = 1 - e^{\cos t} \cos(\sin t)$ of shape (...,).
+
+    """
+    xp = array_namespace(t)  # type: ignore[arg-type]
+    return 1 - xp.exp(xp.cos(t)) * xp.cos(xp.sin(t))
 
 
 def example_13_19(
@@ -39,7 +59,7 @@ def example_13_19(
     The exact solution is
 
     $$
-    \phi(t) = 1 - e^{\cos t} \cos(\sin t).
+    \phi(t) = \text{example\_13\_19\_answer}(t) = 1 - e^{\cos t} \cos(\sin t).
     $$
 
     Parameters
