@@ -4,8 +4,8 @@
     "array-api": {
       "source": "34j/skills",
       "sourceType": "github",
-      "skillPath": ".agents/skills/array-api/SKILL.md",
-      "computedHash": "9d828799c379349dc085bedc440f35da5a77a4ddb2433d956b5d18db0c8b3f3d"
+      "skillPath": "array-api/SKILL.md",
+      "computedHash": "ffae62c48dfaefad095aa6a43ba7e6d3a8cda4bd5ba7bc459295b288c834fbaa"
     },
     "general": {
       "source": "34j/skills",
