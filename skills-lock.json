@@ -1,0 +1,23 @@
+{
+  "version": 1,
+  "skills": {
+    "array-api": {
+      "source": "34j/skills",
+      "sourceType": "github",
+      "skillPath": ".agents/skills/array-api/SKILL.md",
+      "computedHash": "9d828799c379349dc085bedc440f35da5a77a4ddb2433d956b5d18db0c8b3f3d"
+    },
+    "general": {
+      "source": "34j/skills",
+      "sourceType": "github",
+      "skillPath": "general/SKILL.md",
+      "computedHash": "c4ad0a605500c745837207fb94b387946e95fc9bc387e1d8bed7ed9c85619703"
+    },
+    "python": {
+      "source": "34j/skills",
+      "sourceType": "github",
+      "skillPath": "python/SKILL.md",
+      "computedHash": "21d232e607790a3c83ef88be2fe385fcf8c0faca0a9967700db1b68071bdd675"
+    }
+  }
+}
