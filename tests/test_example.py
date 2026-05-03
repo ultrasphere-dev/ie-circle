@@ -20,7 +20,7 @@ def test_example_13_19(
 ) -> None:
     interpolant = example_13_19(a, b, n_nodes, xp=xp, device=device, dtype=dtype)
 
-    eval_points = xp.random.uniform(0, 2 * math.pi, size=(10,), device=device, dtype=dtype)
+    eval_points = xp.random.random_uniform(0, 2 * math.pi, (10,), device=device, dtype=dtype)
 
     expected_phi = example_13_19_answer(eval_points)
 
