@@ -220,7 +220,10 @@ def nystrom_rhs(
     Parameters
     ----------
     rhs : ArrayFunction
-        Right-hand side function $\mathrm{rhs}(x)$.
+        Right-hand side function $\mathrm{rhs}(x)$
+        of (...) -> (..., ...(B), C)
+        where C is the number of circles
+        and B is the batch shape for equations.
     n : int
         Number of discretization points / 2.
     xp : ArrayNamespaceFull
@@ -236,7 +239,9 @@ def nystrom_rhs(
     -------
     tuple[Array, Array]
         The roots $x_j$ of shape (2n - 1,)
-        and the RHS vector of shape (..., ...(B), C).
+        and the RHS vector of shape (..., ...(B), C)
+        where C is the number of circles
+        and B is the batch shape for equations.
 
     """
     x, _ = trapezoidal_quadrature(n, t_start=t_start, xp=xp, device=device, dtype=dtype)
@@ -272,9 +277,15 @@ def nystrom(
     Parameters
     ----------
     a : ArrayFunction
-        Multiplicative term $a(x)$.
+        Multiplicative term $a(x)$
+        of (...) -> (..., ...(B), C)
+        where C is the number of circles
+        and B is the batch shape for equations.
     kernel : Kernel
-        Kernel functions keyed by ``(QuadratureType, order)``.
+        Kernel functions keyed by ``(QuadratureType, order)``
+        of shape (...), (...) -> (..., ...(B), C, C)
+        where C is the number of circles
+        and B is the batch shape for equations.
     rhs : ArrayFunction
         Right-hand side function $\mathrm{rhs}(x)$.
     n : int
@@ -293,7 +304,10 @@ def nystrom(
     Returns
     -------
     NystromInterpolant
-        An object with ``sol`` and ``__call__`` implementing the Nyström interpolant.
+        An object with ``sol`` of shape (...(B), C) where C is the number of circles
+        and B is the batch shape for equations,
+        and callable to evaluate the Nyström interpolant at arbitrary points
+        of (...) -> (..., ...(B), C).
 
     """
     x, A = nystrom_lhs(
