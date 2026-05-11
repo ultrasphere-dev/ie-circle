@@ -3,7 +3,7 @@ from typing import Any, Protocol
 
 from array_api._2024_12 import Array, ArrayNamespaceFull
 from array_api_shape_check import check_shapes
-
+from batch_tensorsolve import btensorsolve
 from ._quadrature import (
     cot_power_quadrature,
     log_cot_power_quadrature,
@@ -32,7 +32,7 @@ class KernelFunction(Protocol):
         Returns
         -------
         Array
-            The kernel function values of shape (..., ...(B), C, C)
+            The kernel function values of shape (..., ...(B), C(x), C(y))
             where [..., i, j] corresponds to kernel((x, i), (y, j)),
             C is the number of circles
             and B is the batch shape for equations.
@@ -99,7 +99,7 @@ def nystrom_lhs(
     dtype: Any,
     t_start_quadrature: float = 0,
     t_start: float = 0,
-) -> tuple[Array, Array]:
+) -> Array:
     r"""
     Returns the left-hand side matrix $A$ of the Nystrom method for the integral equation.
 
@@ -122,7 +122,7 @@ def nystrom_lhs(
         and B is the batch shape for equations.
     kernel : Kernel
         Kernel functions keyed by ``(QuadratureType, order)``
-        of shape (...), (...) -> (..., ...(B), C, C)
+        of shape (...), (...) -> (..., ...(B), C(x), C(y))
         where C is the number of circles
         and B is the batch shape for equations.
     n : int
@@ -140,9 +140,8 @@ def nystrom_lhs(
 
     Returns
     -------
-    tuple[Array, Array]
-        The roots $x_j$ of shape (2n - 1,)
-        and the left-hand side matrix $A$ of shape (..., ...(B), C, C).
+    Array
+        The left-hand side matrix $A$ of shape (...(B), Q(x), C(x), Q(y), C(y)).
 
     """
     x, w = trapezoidal_quadrature(n, t_start=t_start, xp=xp, device=device, dtype=dtype)
@@ -199,8 +198,12 @@ def nystrom_lhs(
         for (quad_type, order), kernel_fn in kernel.items()
     ]
 
+    # (Q(x), Q(y), *B, C(x), C(y))
     A = a_vals_expanded + xp.sum(xp.stack(terms), axis=0)
-    return x, A
+    # (*B, Q(x), C(x), Q(y), C(y))
+    A = xp.moveaxis(A, 0, -3)
+    A = xp.moveaxis(A, 1, -2)
+    return A
 
 
 def nystrom_rhs(
@@ -319,7 +322,7 @@ def nystrom(
         and B is the batch shape for equations.
     kernel : Kernel
         Kernel functions keyed by ``(QuadratureType, order)``
-        of shape (...), (...) -> (..., ...(B), C, C)
+        of shape (...), (...) -> (..., ...(B), C(x), C(y))
         where C is the number of circles
         and B is the batch shape for equations.
     rhs : ArrayFunction
