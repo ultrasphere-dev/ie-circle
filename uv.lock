@@ -46,6 +46,21 @@ wheels = [
 ]
 
 [[package]]
+name = "array-api-shape-check"
+version = "0.1.2"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "attrs" },
+    { name = "more-itertools" },
+    { name = "numpy" },
+    { name = "types-array-api" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/0f/27/52a6b47265e9d613e5b6a761c5916952baa226daea062fbbc3b42df8e801/array_api_shape_check-0.1.2.tar.gz", hash = "sha256:5e6a2e5c65627eede40372836f0cb59b12bd2bf63a75ade3a9d1d67ee2bf830f", size = 10349, upload-time = "2026-05-11T12:32:51.076Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/7c/26/e09e56655dd259a00ff7fb4ce1ae5956dae6d4b3ed91e75b3bf0e1d10e6b/array_api_shape_check-0.1.2-py3-none-any.whl", hash = "sha256:ee7486f5a25acf5e9bc72387c65c64993f604515fe77dce6989ff799ade20b2c", size = 8499, upload-time = "2026-05-11T12:32:49.637Z" },
+]
+
+[[package]]
 name = "attrs"
 version = "26.1.0"
 source = { registry = "https://pypi.org/simple" }
@@ -408,6 +423,7 @@ version = "0.0.0"
 source = { editable = "." }
 dependencies = [
     { name = "array-api-compat" },
+    { name = "array-api-shape-check" },
     { name = "attrs" },
     { name = "numpy" },
     { name = "sympy" },
@@ -435,6 +451,7 @@ docs = [
 [package.metadata]
 requires-dist = [
     { name = "array-api-compat", specifier = ">=1.14" },
+    { name = "array-api-shape-check", specifier = ">=0.1.2" },
     { name = "attrs", specifier = ">=26.1" },
     { name = "numpy", specifier = ">=2.4.4" },
     { name = "sympy", specifier = ">=1.14" },
@@ -446,7 +463,7 @@ dev = [
     { name = "coverage" },
     { name = "pytest", specifier = "==9.*" },
     { name = "pytest-cov", specifier = "==7.*" },
-    { name = "pytest-xdist", specifier = ">=3.8.0" },
+    { name = "pytest-xdist", specifier = ">=3.8" },
     { name = "sybil", extras = ["pytest"] },
     { name = "torch", specifier = ">=2.11" },
     { name = "ty", specifier = ">=0.0.34" },
@@ -583,6 +600,15 @@ source = { registry = "https://pypi.org/simple" }
 sdist = { url = "https://files.pythonhosted.org/packages/d6/54/cfe61301667036ec958cb99bd3efefba235e65cdeb9c84d24a8293ba1d90/mdurl-0.1.2.tar.gz", hash = "sha256:bb413d29f5eea38f31dd4754dd7377d4465116fb207585f97bf925588687c1ba", size = 8729, upload-time = "2022-08-14T12:40:10.846Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/b3/38/89ba8ad64ae25be8de66a6d463314cf1eb366222074cfda9ee839c56a4b4/mdurl-0.1.2-py3-none-any.whl", hash = "sha256:84008a41e51615a49fc9966191ff91509e3c40b939176e643fd50a5c2196b8f8", size = 9979, upload-time = "2022-08-14T12:40:09.779Z" },
+]
+
+[[package]]
+name = "more-itertools"
+version = "11.0.2"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/a2/f7/139d22fef48ac78127d18e01d80cf1be40236ae489769d17f35c3d425293/more_itertools-11.0.2.tar.gz", hash = "sha256:392a9e1e362cbc106a2457d37cabf9b36e5e12efd4ebff1654630e76597df804", size = 144659, upload-time = "2026-04-09T15:01:33.297Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/cb/98/6af411189d9413534c3eb691182bff1f5c6d44ed2f93f2edfe52a1bbceb8/more_itertools-11.0.2-py3-none-any.whl", hash = "sha256:6e35b35f818b01f691643c6c611bc0902f2e92b46c18fffa77ae1e7c46e912e4", size = 71939, upload-time = "2026-04-09T15:01:32.21Z" },
 ]
 
 [[package]]

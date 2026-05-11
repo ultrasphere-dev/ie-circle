@@ -88,10 +88,10 @@ def example_13_19(
     def f(t: Array, /) -> Array:
         part1 = xp.exp(c * xp.cos(t)) * xp.sin(c * xp.sin(t))
         part2 = xp.exp(xp.cos(t)) * xp.sin(xp.sin(t))
-        return part1 + part2
+        return (part1 + part2)[..., None]
 
     def a_func(t: Array, /) -> Array:
-        return xp.zeros_like(t)
+        return xp.zeros_like(t)[..., None]
 
     def k_reg(t: Array, tau: Array, /) -> Array:
         a2 = a**2

@@ -2,6 +2,18 @@ from __future__ import annotations
 
 from typing import Any
 
+# Test a simple, uniquely solvable integral equation:
+# a(x) φ(x)
+# + ∫_0^{2π} [ c0
+#            + c1 log(4 sin^2((x-y)/2))
+#            + c2 log(4 sin^2((x-y)/2)) cot((x-y)/2)
+#            + c3 cot((x-y)/2)
+#            + c4 cot^2((x-y)/2) ] φ(y) dy
+# = rhs(x).
+# We use constant kernels so the expected discretized matrix is a weighted sum
+# of quadrature weight matrices plus a diagonal term a(x).
+from array_api_compat import array_namespace
+
 from ie_circle._bie import (
     ArrayFunction,
     KernelFunction,
@@ -16,28 +28,21 @@ from ie_circle._quadrature import (
     trapezoidal_quadrature,
 )
 
-# Test a simple, uniquely solvable integral equation:
-# a(x) φ(x)
-# + ∫_0^{2π} [ c0
-#            + c1 log(4 sin^2((x-y)/2))
-#            + c2 log(4 sin^2((x-y)/2)) cot((x-y)/2)
-#            + c3 cot((x-y)/2)
-#            + c4 cot^2((x-y)/2) ] φ(y) dy
-# = rhs(x).
-# We use constant kernels so the expected discretized matrix is a weighted sum
-# of quadrature weight matrices plus a diagonal term a(x).
-
 
 def _constant_kernel(value: float) -> KernelFunction:
     def _kernel(x, y):
-        return (x + y) * 0 + value
+        xp = array_namespace(x, y)
+        k_shape = (*xp.broadcast_shapes(x.shape, y.shape)[:-2], x.shape[-2], y.shape[-1])
+        return xp.zeros(k_shape, device=x.device, dtype=x.dtype) + value
 
     return _kernel
 
 
 def _constant_rhs(value: float) -> ArrayFunction:
     def _rhs(x):
-        return (x * 0) + value
+        xp = array_namespace(x)
+        # ensure output has trailing C=1 dimension if it doesn't already
+        return (xp.zeros_like(x) + value)[..., None]
 
     return _rhs
 

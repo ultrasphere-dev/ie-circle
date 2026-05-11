@@ -2,6 +2,7 @@ from enum import StrEnum
 from typing import Any, Protocol
 
 from array_api._2024_12 import Array, ArrayNamespaceFull
+from array_api_shape_check import check_shapes
 
 from ._quadrature import (
     cot_power_quadrature,
@@ -24,14 +25,16 @@ class KernelFunction(Protocol):
         Parameters
         ----------
         x : Array
-            An array of shape (...,).
+            An array of shape (...).
         y : Array
-            An array of shape (...,).
+            An array of shape (...).
 
         Returns
         -------
         Array
-            The kernel function values of shape (..., ...(fixed)).
+            The kernel function values of shape (..., ...(B), C, C)
+            where C is the number of circles
+            and B is the batch shape for equations.
 
         """
         ...
@@ -45,12 +48,14 @@ class ArrayFunction(Protocol):
         Parameters
         ----------
         x : Array
-            An array of shape (...,).
+            An array of shape (...).
 
         Returns
         -------
         Array
-            Function values of shape (...,).
+            Function values of shape (..., ...(B), C)
+            where C is the number of circles
+            and B is the batch shape for equations.
 
         """
         ...
@@ -66,12 +71,14 @@ class NystromInterpolant(Protocol):
         Parameters
         ----------
         x : Array
-            Evaluation points of shape (...,).
+            Evaluation points of shape (...).
 
         Returns
         -------
         Array
-            Interpolated values of shape (...,).
+            Interpolated values of shape (..., ...(B), C)
+            where C is the number of circles
+            and B is the batch shape for equations.
 
         """
         ...
@@ -107,9 +114,15 @@ def nystrom_lhs(
     Parameters
     ----------
     a : ArrayFunction
-        Multiplicative term $a(x)$.
+        Multiplicative term $a(x)$
+        of (...) -> (..., ...(B), C)
+        where C is the number of circles
+        and B is the batch shape for equations.
     kernel : Kernel
-        Kernel functions keyed by ``(QuadratureType, order)``.
+        Kernel functions keyed by ``(QuadratureType, order)``
+        of shape (...), (...) -> (..., ...(B), C, C)
+        where C is the number of circles
+        and B is the batch shape for equations.
     n : int
         Number of discretization points / 2
     xp : ArrayNamespaceFull
@@ -127,25 +140,36 @@ def nystrom_lhs(
     -------
     tuple[Array, Array]
         The roots $x_j$ of shape (2n - 1,)
-        and the left-hand side matrix $A$ of shape (2n - 1, 2n - 1).
+        and the left-hand side matrix $A$ of shape (..., ...(B), C, C).
 
     """
-    x, w = trapezoidal_quadrature(n, t_start=t_start_quadrature, xp=xp, device=device, dtype=dtype)
+    x, w = trapezoidal_quadrature(n, t_start=t_start, xp=xp, device=device, dtype=dtype)
     n_quad = 2 * n - 1
-    x_eval = x + t_start
-    y = x_eval[None, :]
-
-    w_scalar = w[0]
-    idx = (
+    idx_roll = (
         xp.arange(n_quad, device=device, dtype=xp.int64)[:, None]
         + xp.arange(n_quad, device=device, dtype=xp.int64)[None, :]
     ) % n_quad
 
-    x = x_eval[:, None]
+    # (n_quad, *B, C)
+    a_vals = a(x)
+    info_a = check_shapes("Q*BC", a_vals, names="a_vals")
+    B_shape = info_a.unique["b"].shape_broadcasted
+    B_ndim = len(B_shape)
+    C = info_a.unique["c"].shape_broadcasted[-1]
+    a_vals_expanded = (
+        a_vals[:, None, ..., :, None]
+        * xp.eye(n_quad)[(...,) + (None,) * (B_ndim + 2)]
+        * xp.eye(C)[(None,) * (B_ndim + 2) + (...,)]
+    )
+    # (n_quad, 1)
+    x_kernel = x[:, None]
+    # (1, n_quad)
+    y_kernel = x[None, :]
+
     weight_by_key: dict[tuple[QuadratureType, int], Array] = {}
     for quad_type, order in kernel:
         if quad_type == QuadratureType.NO_SINGULARITY:
-            weight_by_key[(quad_type, order)] = w_scalar
+            weight_by_key[(quad_type, order)] = w[idx_roll][(...,) + (None,) * (B_ndim + 2)]
         elif quad_type == QuadratureType.LOG_COT_POWER:
             _, w_log_vec = log_cot_power_quadrature(
                 n,
@@ -155,7 +179,7 @@ def nystrom_lhs(
                 device=device,
                 dtype=dtype,
             )
-            weight_by_key[(quad_type, order)] = w_log_vec[idx]
+            weight_by_key[(quad_type, order)] = w_log_vec[idx_roll][(...,) + (None,) * (B_ndim + 2)]
         elif quad_type == QuadratureType.COT_POWER:
             _, w_cauchy_vec = cot_power_quadrature(
                 n,
@@ -165,20 +189,20 @@ def nystrom_lhs(
                 device=device,
                 dtype=dtype,
             )
-            weight_by_key[(quad_type, order)] = w_cauchy_vec[idx]
+            weight_by_key[(quad_type, order)] = w_cauchy_vec[idx_roll][
+                (...,) + (None,) * (B_ndim + 2)
+            ]
         else:
             msg = f"Unsupported quadrature type: {quad_type}"  # type: ignore[unreachable]
             raise ValueError(msg)
 
     terms = [
-        kernel_fn(x, y) * weight_by_key[(quad_type, order)]
+        kernel_fn(x_kernel, y_kernel) * weight_by_key[(quad_type, order)]
         for (quad_type, order), kernel_fn in kernel.items()
     ]
-    a_vals = a(x[:, 0])
-    A = xp.eye(n_quad, dtype=dtype, device=device) * a_vals[:, None] + xp.sum(
-        xp.stack(terms), axis=0
-    )
-    return x[:, 0], A
+
+    A = a_vals_expanded + xp.sum(xp.stack(terms), axis=0)
+    return x, A
 
 
 def nystrom_rhs(
@@ -212,12 +236,12 @@ def nystrom_rhs(
     -------
     tuple[Array, Array]
         The roots $x_j$ of shape (2n - 1,)
-        and the RHS vector of shape (2n - 1,).
+        and the RHS vector of shape (..., ...(B), C).
 
     """
     x, _ = trapezoidal_quadrature(n, t_start=t_start, xp=xp, device=device, dtype=dtype)
-    b = rhs(x)
-    return x, b
+    b_vec = rhs(x)
+    return x, b_vec
 
 
 def nystrom(
