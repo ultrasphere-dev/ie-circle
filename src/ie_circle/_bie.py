@@ -92,11 +92,11 @@ Kernel = dict[tuple[QuadratureType, int], KernelFunction]
 def nystrom_lhs(
     a: ArrayFunction,
     kernel: Kernel,
+    *,
     n: int,
     xp: ArrayNamespaceFull,
     device: Any,
     dtype: Any,
-    *,
     t_start_quadrature: float = 0,
     t_start: float = 0,
 ) -> tuple[Array, Array]:
@@ -126,7 +126,7 @@ def nystrom_lhs(
         where C is the number of circles
         and B is the batch shape for equations.
     n : int
-        Number of discretization points / 2
+        The maximum order - 1.
     xp : ArrayNamespaceFull
         The array namespace.
     device : Any
@@ -134,9 +134,9 @@ def nystrom_lhs(
     dtype : Any
         The dtype.
     t_start_quadrature : float
-        Quadrature node shift applied in weight construction.
+        Quadrature node shift applied to added points (column index).
     t_start : float
-        Shift applied to evaluation points for $a(x)$ and kernel functions.
+        Shift applied to evaluation points for $a(x)$ and kernel functions (row index).
 
     Returns
     -------
@@ -146,6 +146,7 @@ def nystrom_lhs(
 
     """
     x, w = trapezoidal_quadrature(n, t_start=t_start, xp=xp, device=device, dtype=dtype)
+    y, _ = trapezoidal_quadrature(n, t_start=t_start_quadrature, xp=xp, device=device, dtype=dtype)
     n_quad = 2 * n - 1
     idx_roll = (
         xp.arange(n_quad, device=device, dtype=xp.int64)[:, None]
@@ -163,17 +164,13 @@ def nystrom_lhs(
         * xp.eye(n_quad)[(...,) + (None,) * (B_ndim + 2)]
         * xp.eye(C)[(None,) * (B_ndim + 2) + (...,)]
     )
-    # (n_quad, 1)
-    x_kernel = x[:, None]
-    # (1, n_quad)
-    y_kernel = x[None, :]
 
     weight_by_key: dict[tuple[QuadratureType, int], Array] = {}
     for quad_type, order in kernel:
         if quad_type == QuadratureType.NO_SINGULARITY:
-            weight_by_key[(quad_type, order)] = w[idx_roll][(...,) + (None,) * (B_ndim + 2)]
+            _, w = trapezoidal_quadrature(n, t_start=t_start_quadrature, xp=xp, device=device, dtype=dtype)
         elif quad_type == QuadratureType.LOG_COT_POWER:
-            _, w_log_vec = log_cot_power_quadrature(
+            _, w = log_cot_power_quadrature(
                 n,
                 order,
                 t_start=t_start_quadrature,
@@ -181,9 +178,8 @@ def nystrom_lhs(
                 device=device,
                 dtype=dtype,
             )
-            weight_by_key[(quad_type, order)] = w_log_vec[idx_roll][(...,) + (None,) * (B_ndim + 2)]
         elif quad_type == QuadratureType.COT_POWER:
-            _, w_cauchy_vec = cot_power_quadrature(
+            _, w = cot_power_quadrature(
                 n,
                 order,
                 t_start=t_start_quadrature,
@@ -191,15 +187,15 @@ def nystrom_lhs(
                 device=device,
                 dtype=dtype,
             )
-            weight_by_key[(quad_type, order)] = w_cauchy_vec[idx_roll][
-                (...,) + (None,) * (B_ndim + 2)
-            ]
         else:
             msg = f"Unsupported quadrature type: {quad_type}"  # type: ignore[unreachable]
             raise ValueError(msg)
+        weight_by_key[(quad_type, order)] = w
 
     terms = [
-        kernel_fn(x_kernel, y_kernel) * weight_by_key[(quad_type, order)]
+        kernel_fn(x[:, None], y[None, :]) * weight_by_key[(quad_type, order)][idx_roll][
+                (...,) + (None,) * (B_ndim + 2)
+            ]
         for (quad_type, order), kernel_fn in kernel.items()
     ]
 
@@ -209,11 +205,11 @@ def nystrom_lhs(
 
 def nystrom_rhs(
     rhs: ArrayFunction,
+    *,
     n: int,
     xp: ArrayNamespaceFull,
     device: Any,
     dtype: Any,
-    *,
     t_start: float = 0,
 ) -> tuple[Array, Array]:
     r"""
@@ -227,7 +223,7 @@ def nystrom_rhs(
         where C is the number of circles
         and B is the batch shape for equations.
     n : int
-        Number of discretization points / 2.
+        The maximum order - 1.
     xp : ArrayNamespaceFull
         The array namespace.
     device : Any
@@ -246,9 +242,47 @@ def nystrom_rhs(
         and B is the batch shape for equations.
 
     """
-    x, _ = trapezoidal_quadrature(n, t_start=t_start, xp=xp, device=device, dtype=dtype)
+    x, _ = trapezoidal_quadrature(n, t_start=t_start, xp=xp, device=device, dtype=dtype, t_start)
     b_vec = rhs(x)
     return x, b_vec
+
+def trapezoidal_basis(x: Array, /, *, t_start: float | None, t_start_factor: float | None, n: int, xp: ArrayNamespaceFull, device: Any, dtype: Any) -> Array:
+    r"""
+    Evaluates the basis
+
+    $
+    1/N' \sum_(\abs(m) < N) exp(-im(t_j + t_\mathrm{start})) * exp(imx)
+    $
+
+    Parameters
+    ----------
+    x : Array
+        The points to evaluate of shape (...,).
+    n : int
+        The maximum order - 1.
+    t_start : float | None
+        Grid shift $t_\mathrm{start}$.
+    t_start_factor : float | None
+        Grid shift as a multiple of $h = 2\pi/(2n-1)$.
+    xp : ArrayNamespaceFull
+        The array namespace.
+    device : Any
+        The device.
+    dtype : Any
+        The dtype.
+
+    Returns
+    -------
+    Array
+        The basis evaluated at x of shape (..., n).
+    """
+    t, _ = trapezoidal_quadrature(n, xp=xp, device=device, dtype=dtype, t_start=t_start)
+    n_quad = 2 * n - 1
+    m = xp.arange(-(n - 1), n, device=device)
+    return 1/n_quad * xp.sum(
+        xp.exp(-1j * m[None, :] * (t[:, None] - x[..., None, None])), axis=-1
+    )
+
 
 
 def nystrom(
@@ -325,20 +359,13 @@ def nystrom(
     _, b = nystrom_rhs(rhs, n, xp, device, dtype, t_start=t_start)
     sol = xp.linalg.solve(A, b)
 
-    n_quad = 2 * n - 1
-    m = xp.arange(-(n - 1), n, device=device)
-    x_nodes = x
-    phase_nodes = xp.exp((-1j) * m[:, None] * x_nodes[None, :])
-    coeffs = xp.sum(sol[None, :] * phase_nodes, axis=1)
-
     class _Interpolant:
         def __init__(self, sol_values: Array) -> None:
             self.sol = sol_values
 
-        def __call__(self, x_eval: Array, /) -> Array:
-            x_flat = xp.reshape(x_eval, (-1,))
-            phase_eval = xp.exp(1j * m[:, None] * x_flat[None, :])
-            values = (1 / n_quad) * xp.sum(coeffs[:, None] * phase_eval, axis=0)
-            return xp.reshape(values, x_flat.shape)
+        def __call__(self, x: Array, /) -> Array:
+            xp = array_namespace(x)
+
+
 
     return _Interpolant(sol)
