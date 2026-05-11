@@ -225,7 +225,7 @@ def nystrom_rhs(
     dtype: Any,
     t_start: float | None = None,
     t_start_factor: float | None = None,
-) -> tuple[Array, Array]:
+) -> Array:
     r"""
     Returns the quadrature nodes and right-hand side vector.
 
@@ -383,8 +383,9 @@ def nystrom(
         t_start_quadrature=t_start_quadrature,
         t_start=t_start,
     )
-    b = nystrom_rhs(rhs, n, xp, device, dtype, t_start=t_start)
-    sol = xp.linalg.solve(A, b)
+    b = nystrom_rhs(rhs, n=n, xp=xp, device=device, dtype=dtype, t_start=t_start, t_start_factor=t_start_factor)
+    # (*B, Q, C)
+    sol = btensorsolve(A, b, num_batch_axes=2)
 
     class _Interpolant:
         def __init__(self, sol_values: Array) -> None:
@@ -392,6 +393,16 @@ def nystrom(
 
         def __call__(self, x: Array, /) -> Array:
             xp = array_namespace(x)
+            # (..., Q)
+            basis = trapezoidal_basis(
+                x,
+                n=n,
+                t_start=t_start,
+                t_start_factor=t_start_factor,
+                xp=xp,
+                device=device,
+                dtype=dtype,
+            )
 
 
 
