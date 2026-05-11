@@ -33,7 +33,8 @@ class KernelFunction(Protocol):
         -------
         Array
             The kernel function values of shape (..., ...(B), C, C)
-            where C is the number of circles
+            where [..., i, j] corresponds to kernel((x, i), (y, j)),
+            C is the number of circles
             and B is the batch shape for equations.
 
         """
@@ -54,7 +55,8 @@ class ArrayFunction(Protocol):
         -------
         Array
             Function values of shape (..., ...(B), C)
-            where C is the number of circles
+            where [..., i] corresponds to func((x, i)),
+            C is the number of circles
             and B is the batch shape for equations.
 
         """
