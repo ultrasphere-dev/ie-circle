@@ -213,7 +213,8 @@ def nystrom_rhs(
     xp: ArrayNamespaceFull,
     device: Any,
     dtype: Any,
-    t_start: float = 0,
+    t_start: float | None = None,
+    t_start_factor: float | None = None,
 ) -> tuple[Array, Array]:
     r"""
     Returns the quadrature nodes and right-hand side vector.
@@ -233,21 +234,24 @@ def nystrom_rhs(
         The device.
     dtype : Any
         The dtype.
-    t_start : float
-        Grid shift for the quadrature nodes.
+    t_start : float | None
+        Grid shift $t_\mathrm{start}$.
+    t_start_factor : float | None
+        Grid shift as a multiple of $h = 2\pi/(2n-1)$.
 
     Returns
     -------
     tuple[Array, Array]
-        The roots $x_j$ of shape (2n - 1,)
-        and the RHS vector of shape (..., ...(B), C)
+        The RHS vector of shape (...(B), Q, C)
         where C is the number of circles
         and B is the batch shape for equations.
 
     """
-    x, _ = trapezoidal_quadrature(n, t_start=t_start, xp=xp, device=device, dtype=dtype, t_start)
-    b_vec = rhs(x)
-    return x, b_vec
+    x, _ = trapezoidal_quadrature(n, xp=xp, device=device, dtype=dtype, t_start=t_start, t_start_factor=t_start_factor)
+    # (Q, *B, C)
+    b = rhs(x)
+    b = xp.moveaxis(b, 0, -2)
+    return b
 
 def trapezoidal_basis(x: Array, /, *, t_start: float | None, t_start_factor: float | None, n: int, xp: ArrayNamespaceFull, device: Any, dtype: Any) -> Array:
     r"""
@@ -349,7 +353,7 @@ def nystrom(
         of (...) -> (..., ...(B), C).
 
     """
-    x, A = nystrom_lhs(
+    A = nystrom_lhs(
         a,
         kernel,
         n,
