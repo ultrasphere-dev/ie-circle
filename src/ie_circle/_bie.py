@@ -97,8 +97,10 @@ def nystrom_lhs(
     xp: ArrayNamespaceFull,
     device: Any,
     dtype: Any,
-    t_start_quadrature: float = 0,
-    t_start: float = 0,
+    t_start_quadrature: float | None = None,
+    t_start_factor_quadrature: float | None = None,
+    t_start: float | None = None,
+    t_start_factor: float | None = None,
 ) -> Array:
     r"""
     Returns the left-hand side matrix $A$ of the Nystrom method for the integral equation.
@@ -133,10 +135,18 @@ def nystrom_lhs(
         The device.
     dtype : Any
         The dtype.
-    t_start_quadrature : float
-        Quadrature node shift applied to added points (column index).
-    t_start : float
-        Shift applied to evaluation points for $a(x)$ and kernel functions (row index).
+    t_start_quadrature : float | None
+        Grid shift $t_\mathrm{start}$.
+        Applied to column points.
+    t_start_factor_quadrature : float | None
+        Grid shift as a multiple of $h = 2\pi/(2n-1)$.
+        Applied to column points.
+    t_start : float | None
+        Grid shift $t_\mathrm{start}$.
+        Applied to row points.
+    t_start_factor : float | None
+        Grid shift as a multiple of $h = 2\pi/(2n-1)$.
+        Applied to row points.
 
     Returns
     -------
@@ -301,8 +311,10 @@ def nystrom(
     device: Any,
     dtype: Any,
     *,
-    t_start_quadrature: float = 0,
-    t_start: float = 0,
+    t_start_quadrature: float | None = None,
+    t_start_factor_quadrature: float | None = None,
+    t_start: float | None = None,
+    t_start_factor: float | None = None,
 ) -> NystromInterpolant:
     r"""
     Solves integral equations using the Nyström method.
@@ -339,10 +351,18 @@ def nystrom(
         The device.
     dtype : Any
         The dtype.
-    t_start_quadrature : float
-        Quadrature node shift applied in weight construction.
-    t_start : float
-        Shift applied to evaluation points for $a(x)$ and kernel functions.
+    t_start_quadrature : float | None
+        Grid shift $t_\mathrm{start}$.
+        Applied to column points.
+    t_start_factor_quadrature : float | None
+        Grid shift as a multiple of $h = 2\pi/(2n-1)$.
+        Applied to column points.
+    t_start : float | None
+        Grid shift $t_\mathrm{start}$.
+        Applied to row points.
+    t_start_factor : float | None
+        Grid shift as a multiple of $h = 2\pi/(2n-1)$.
+        Applied to row points.
 
     Returns
     -------
@@ -356,14 +376,14 @@ def nystrom(
     A = nystrom_lhs(
         a,
         kernel,
-        n,
-        xp,
-        device,
-        dtype,
+        n=n,
+        xp=xp,
+        device=device,
+        dtype=dtype,
         t_start_quadrature=t_start_quadrature,
         t_start=t_start,
     )
-    _, b = nystrom_rhs(rhs, n, xp, device, dtype, t_start=t_start)
+    b = nystrom_rhs(rhs, n, xp, device, dtype, t_start=t_start)
     sol = xp.linalg.solve(A, b)
 
     class _Interpolant:
