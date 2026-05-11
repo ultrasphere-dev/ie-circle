@@ -29,7 +29,7 @@ description: Conventions that MUST be followed when implementing array API compa
   - **Arguments: function -> GUFunc-compatible** If the function needs function arguments, assume that to be also GUFunc-compatible. The argument description should end with `of (..., a, b) -> (..., c, d, e)`. Don't add any word in the following sentence: "GUFunc-compatible vectorized function from array to array", just explain the mathematical meaning of the function and its shape convention.
   - **Arguments & Docstring: function shape convention should be reasonable to the function**: Conceptually (mathematically) unrelated axes to function should be placed at the _beginning_ of the shape as `...`.
     - _Example_: When mathetically integrating `n_func` functions using `n_quad` quadrature points, the function shape convention should be written as `(...) -> (..., n_func)` (`(:) -> (:, n_func)` if the user explicitly specifies to implement function not GUFunc-compatible), not `(n_quad) -> (n_quad, n_func)` or `(n_quad) -> (n_func, n_quad)`, because `n_quad` has nothing to do with functions mathematically.
-  - `xp.moveaxis()` may be used without worrying about performance. Fully follow the above rule without worrying about performance and internal complexity.
+  - `xp.moveaxis()` may be used without worrying about performance, do not worry about internal complexity whcn choosing convention.
   - Do not worry about axis performance when choosing convention.
   - **Docstring: function output-dependent shape**: When the shape is variable (depending on function etc.) one can do `(..., ...(f))` where `f` implies the function but may replaced with something more suitable. `(..., *something)` is also possible but less preferred, yet sometimes it might be more suitable.
   - **Docstring**: The docstring should be Numpydoc style.
@@ -58,6 +58,108 @@ description: Conventions that MUST be followed when implementing array API compa
     ```
 
   - **Docstring: shape**: The docstring should mention the shape of the input / output arrays and the argument description should end with `of shape (..., a, b)`.
+  - **Shape checking**: The function should check the shape at the very beginning of its implementation.
+    - Check every shape variable (etc. `N`) is correct
+    - Check every variable-length shape variable (etc. `...`, `...(f)`) is both broadcastable and moreover has the same dimensions. (Does not need to have same shape.)
+    - These should be done using `array_api_shape_check.check_shapes()` function, which syntax is as follows. The result may be useful for later computation in some cases.
+
+      ```python
+      def func(x: Array, y: Array) -> Array:
+          """
+          Parameters
+          ----------
+          x : Array
+              Array of shape (..., A, B).
+          y : Array
+              Array of shape (..., ...(C), D, E).
+          """
+          info = check_shapes("...AB,...*CDE", x, y, names="x,y")
+          # use info for later computation if useful
+          z = xp.zeros(info.unique["C"].shape_broadcasted, device=x.device, dtype=x.dtype)
+      ```
+
+      ```python
+      def check_shapes(
+          subscripts: str, /, *operands: Array | tuple[int, ...], names: str | None = None
+      ) -> SubscriptInfoFromShape:
+          """
+          Parse variable subscript ndims by solving linear equations.
+
+          Parameters
+          ----------
+          subscripts : str
+              Subscripts separated by "," per operand.
+
+              1. Subscripts must be of length 1
+              2. Subscripts must not be "*" or ".".
+              3. If start with "*", the subscript is treated as variable.
+              4. "..." is replaced with "*.".]
+          operands : Array or tuple[int, ...]
+              Arrays or shape tuples corresponding to check.
+          ndims : Sequence[int]
+              The number of dimensions for each operand.
+          names : str | None
+              The names of operands separated by ",",
+              used for error messages. If None, operand indices are used instead.
+
+          Returns
+          -------
+          SubscriptInfoFromSubcript
+              The parsed subscript info.
+
+          Raises
+          ------
+          ValueError
+              If the subscript is invalid.
+
+          Examples
+          --------
+          >>> info = check_shapes("ij,*k*l,*li", (1, 4), (5, 6, 7), (1, 7, 3))
+          >>> info.all
+          ((i:1->3, j:4), (*k:(5,), *l:(6, 7)), (*l:(1, 7)->(6, 7), i:3))
+          >>> info.unique
+          {'i': i:3, 'j': j:4, 'k': *k:(5,), 'l': *l:(6, 7)}
+
+          Internally `check_shapes()` calls `parse_variable_ndim()`,
+          which determines the number of dimensions for variable subscripts by least squares.
+          If this is successful, checks if each subscript is consistent,
+          then finnaly raises error for all inconsistencies at once.
+
+          Diving into the details of the first item:
+
+          >>> item = info.all[0][0]
+          >>> item.name  # the name of the subscript
+          'i'
+          >>> item.is_variable  # whether the subscript is variable (starts with "*")
+          False
+          >>> item.shape_current  # the current shape of the subscript
+          (1,)
+          >>> item.shape_broadcasted  # the broadcasted shape of the subscript
+          (3,)
+
+          Not enough information to determine variable subscript ndims:
+
+          >>> import pytest
+          >>> with pytest.raises(InconsistentNdimErrorMultipleSolutions, match="number of variables"):
+          ...     check_shapes("*i*j", (1, 1))
+          >>> with pytest.raises(InconsistentNdimErrorMultipleSolutions, match="rank"):
+          ...     check_shapes("*i*j,*i*j", (1, 1), (1, 1))
+
+          No solution to determine variable subscript ndims:
+
+          >>> with pytest.raises(InconsistentNdimErrorNoSolutions, match="residuals"):
+          ...     check_shapes("*i,*i", (1, 1), (1, 1, 1))
+          >>> with pytest.raises(InconsistentNdimErrorNoSolutions, match="negative"):
+          ...     check_shapes("*ij", ())
+
+          Does not match:
+          >>> with pytest.raises(InconsistentShapeError):
+          ...     check_shapes("ij,*k*l,*li", (3, 4), (5, 6), (1, 7, 3))
+
+          """
+          ...
+      ```
+
   - **Importing Numpy allowed only for constants**: Never import `numpy` directly, unless for constants like `np.pi` for context when `xp` is not available.
   - **Type promotion**: Understand Type promotion rules, i.e. float64 + complex64 -> complex128. Mixed integer and floating-point type promotion rules are not specified, but we assume that for every floating (including complex) dtype x, x + (int type) -> x.
   - **Type promotion: no wrapping Python scalars**: Avoid wrapping `int` arrays, Python scalars with `xp.asarray()` but use them directly (because it is redundant). The exception is when you need to divide int by int (in this case you only need to wrap one of them).
@@ -65,7 +167,7 @@ description: Conventions that MUST be followed when implementing array API compa
   - **Type promotion**: The type can be converted by `xp.astype(x, dtype, /)`.
   - **Avoid float when possible**: Avoid expressing integer as float. `1` instead of `1.0` whenever possible.
   - **Type promotion: Scipy -> input cpu, output asarray**: As an exception, if Scipy functions are needed (e.g. `scipy.special.yv`), do `xp.asarray(yv(xp.asarray(x, device="cpu")), device=x.device, dtype=x.dtype)`. (Do not specify dtype in the inner `asarray`). Note that every array has property `device` (including NumPy >= 2.0), you don't need `getattr`.
-  - **Expand dimensions using []**: When expanding dimensions, prefer something like `x[(...,) + (None,) * n + (slice(None),) * m]` or `x[(slice(None),) * m + (None,) * n + (...,)]` over `xp.reshape()`. Avoid creating "expanded version` and "non-expanded version" of the same array, unless both of them are frequently used.
+  - **Expand dimensions using []**: When expanding dimensions, prefer something like `x[(...,) + (None,) * n + (slice(None),) * m]` or `x[(slice(None),) * m + (None,) * n + (...,)]`. Never use `xp.reshape()` or `xp.expand_dims()` when the above method is possible. Avoid creating "expanded version` and "non-expanded version" of the same array, unless both of them are frequently used.
   - **Type promotion: no complex -> float (terrible undetectable bug)** Do not `asarray(x, dtype=dtype)` if `x` is complex dtype and `dtype` is float. This sometimes happens when `dtype` is an variable (trying to make function that is any-float compatible e.g. float32 -> float32 / complex64, complex64 -> complex64, float64 -> float64 / complex128, complex128 -> complex128). It will be equivalent to `xp.real(x)` which may cause severe numerical issues. Instead do `xp.asarray(x, dtype=xp.promote_types(x.dtype, xp.promote_types(dtype, complex)))`.
 
 ## Tests
