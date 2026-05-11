@@ -4,6 +4,7 @@ from typing import Any, Protocol
 from array_api._2024_12 import Array, ArrayNamespaceFull
 from array_api_shape_check import check_shapes
 from batch_tensorsolve import btensorsolve
+
 from ._quadrature import (
     cot_power_quadrature,
     log_cot_power_quadrature,
@@ -177,7 +178,9 @@ def nystrom_lhs(
     weight_by_key: dict[tuple[QuadratureType, int], Array] = {}
     for quad_type, order in kernel:
         if quad_type == QuadratureType.NO_SINGULARITY:
-            _, w = trapezoidal_quadrature(n, t_start=t_start_quadrature, xp=xp, device=device, dtype=dtype)
+            _, w = trapezoidal_quadrature(
+                n, t_start=t_start_quadrature, xp=xp, device=device, dtype=dtype
+            )
         elif quad_type == QuadratureType.LOG_COT_POWER:
             _, w = log_cot_power_quadrature(
                 n,
@@ -202,9 +205,8 @@ def nystrom_lhs(
         weight_by_key[(quad_type, order)] = w
 
     terms = [
-        kernel_fn(x[:, None], y[None, :]) * weight_by_key[(quad_type, order)][idx_roll][
-                (...,) + (None,) * (B_ndim + 2)
-            ]
+        kernel_fn(x[:, None], y[None, :])
+        * weight_by_key[(quad_type, order)][idx_roll][(...,) + (None,) * (B_ndim + 2)]
         for (quad_type, order), kernel_fn in kernel.items()
     ]
 
@@ -257,15 +259,28 @@ def nystrom_rhs(
         and B is the batch shape for equations.
 
     """
-    x, _ = trapezoidal_quadrature(n, xp=xp, device=device, dtype=dtype, t_start=t_start, t_start_factor=t_start_factor)
+    x, _ = trapezoidal_quadrature(
+        n, xp=xp, device=device, dtype=dtype, t_start=t_start, t_start_factor=t_start_factor
+    )
     # (Q, *B, C)
     b = rhs(x)
     b = xp.moveaxis(b, 0, -2)
     return b
 
-def trapezoidal_basis(x: Array, /, *, t_start: float | None, t_start_factor: float | None, n: int, xp: ArrayNamespaceFull, device: Any, dtype: Any) -> Array:
+
+def trapezoidal_basis(
+    x: Array,
+    /,
+    *,
+    t_start: float | None,
+    t_start_factor: float | None,
+    n: int,
+    xp: ArrayNamespaceFull,
+    device: Any,
+    dtype: Any,
+) -> Array:
     r"""
-    Evaluates the basis
+    Evaluates the basis.
 
     $
     1/N' \sum_(\abs(m) < N) exp(-im(t_j + t_\mathrm{start})) * exp(imx)
@@ -292,14 +307,14 @@ def trapezoidal_basis(x: Array, /, *, t_start: float | None, t_start_factor: flo
     -------
     Array
         The basis evaluated at x of shape (..., n).
+
     """
     t, _ = trapezoidal_quadrature(n, xp=xp, device=device, dtype=dtype, t_start=t_start)
     n_quad = 2 * n - 1
     m = xp.arange(-(n - 1), n, device=device)
-    return 1/n_quad * xp.sum(
-        xp.exp(-1j * m[None, :] * (t[:, None] - x[..., None, None])), axis=-1
+    return (
+        1 / n_quad * xp.sum(xp.exp(-1j * m[None, :] * (t[:, None] - x[..., None, None])), axis=-1)
     )
-
 
 
 def nystrom(
@@ -383,7 +398,9 @@ def nystrom(
         t_start_quadrature=t_start_quadrature,
         t_start=t_start,
     )
-    b = nystrom_rhs(rhs, n=n, xp=xp, device=device, dtype=dtype, t_start=t_start, t_start_factor=t_start_factor)
+    b = nystrom_rhs(
+        rhs, n=n, xp=xp, device=device, dtype=dtype, t_start=t_start, t_start_factor=t_start_factor
+    )
     # (*B, Q, C)
     sol = btensorsolve(A, b, num_batch_axes=2)
 
@@ -394,7 +411,7 @@ def nystrom(
         def __call__(self, x: Array, /) -> Array:
             xp = array_namespace(x)
             # (..., Q)
-            basis = trapezoidal_basis(
+            trapezoidal_basis(
                 x,
                 n=n,
                 t_start=t_start,
@@ -403,7 +420,5 @@ def nystrom(
                 device=device,
                 dtype=dtype,
             )
-
-
 
     return _Interpolant(sol)
