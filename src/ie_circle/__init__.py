@@ -1,4 +1,4 @@
-__version__ = "0.0.0"
+__version__ = "0.1.0"
 from ._bie import nystrom, nystrom_lhs, nystrom_rhs
 from ._example import example_13_19, example_13_19_answer
 from ._fourier_integral import (
