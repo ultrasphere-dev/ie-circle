@@ -140,7 +140,6 @@ The below thorem is used everywhere.
       = (2 pi) sum_(k, l in ZZ without {0}, k + l + m = 0) 1/(abs(k) abs(l)) = (2 pi) sum_(k in ZZ without {0}, l in ZZ, k + l + m = 0) 1/(abs(k) abs(l)) = (2 pi) sum_(k in ZZ without {0, -m}) 1/(abs(k) abs(m + k))$
     - $forall m in NN. sum_(k in ZZ without {0, -m}) 1/(abs(k) abs(m + k)) = sum_(k = 1)^(infinity) 1/(k (m + k)) + sum_(k = -m + 1)^(-1) 1/(abs(k) abs(m + k)) + sum_(k = -infinity)^(- m + 1) 1/(abs(k) abs(m + k)) = sum_(k = 1)^(infinity) 1/(k (m + k)) + sum_(k = 1)^(m - 1) 1/(k (m - k)) + sum_(k = 1)^(infinity) 1/(k (m + k)) = 2/m sum_(k = 1)^(infinity) (1/k - 1/(m + k)) + 1/m sum_(k = 1)^(m - 1) (1/k + 1/(m - k)) = 2/m (sum_(k = 1)^m 1/k + sum_(k = 1)^(m - 1) 1/k) = 2/m (2 H_m - 1/m)$
 ]
-
 #theorem[Estimates for $I_(m,n), J_(m,n)$][
   + $forall m in ZZ without {0}. forall n in NN_0. abs(I_(m,n)) <= 2 pi n abs(m)^(n-1)$
   + $forall m in ZZ without {0}. forall n in NN_0. abs(J_(m,n)) <= 2 pi (n + 1)^2 abs(m)^(n)$
@@ -154,7 +153,7 @@ The below thorem is used everywhere.
   + $J_(m,n)$
     - $n = 0$: $abs(J_(m, 0)) = (2 pi)/abs(m) <= 2 pi$
     - $n = 1$: $abs(J_(m, 1)) = 2 pi abs(2 H_(abs(m)) - 1/abs(m)) <= 8 pi abs(m)$
-    - $n > 1$: $abs(J_(m,n)) = abs((2 i m)/(n-1) J_(m,n-1) - J_(m,n-2) + 2/(n-1) I_(m,n)) <= (2 abs(m))/(n - 1) abs(J_(m, n-1)) + abs(J_(m, n-2)) + 2/(n - 1) abs(I_(m, n)) <= (2 abs(m))/(n - 1) dot 4 pi n^2 abs(m)^(n - 1) + 4 pi (n-1)^2 abs(m)^(n - 2) + 4 pi n/(n - 1) abs(m)^(n - 1) <= 4 pi (2 n + (n - 1)^2 + 2) abs(m)^n = 4 pi (n^2 + 1) abs(m)^n <= 4 pi (n + 1)^2 abs(m)^n$
+    - $n > 1$: $abs(J_(m,n)) = abs((2 i m)/(n-1) J_(m,n-1) - J_(m,n-2) + 2/(n-1) I_(m,n)) <= (2 abs(m))/(n - 1) abs(J_(m, n-1)) + abs(J_(m, n-2)) + 2/(n - 1) abs(I_(m, n)) <= (2 abs(m))/(n - 1) dot 4 pi n^2 abs(m)^(n - 1) + 4 pi (n-1)^2 abs(m)^(n - 2) + 4 pi n/(n - 1) abs(m)^(n - 1) <= 4 pi (4 n + (n - 1)^2 + 2) abs(m)^n = 4 pi (n^2 + 2n + 1) abs(m)^n = 4 pi (n + 1)^2 abs(m)^n$
 ]
 // - $n = 2$: $<= 4 pi (2 (n - 1) + 1 + 2) abs(m)^(n - 1) = 4 pi 5 abs(m)^(n - 1) <= 4 pi n^2 abs(m)^n$
 // - $n > 2$:$
@@ -250,6 +249,18 @@ Combining the above lemma with the exact integral values of Fourier basis functi
 
 = Integral Equations
 
+#let binv = $B^("inv")$
+#theorem[
+  $X$: Banach space,
+  $forall A in B(X). forall T in binv(X). norm(T^(-1) (T - A)) < 1 ==> A in binv(X)$
+]
+#proof[
+  Neumann series implies $(I - (T^(-1) (A - T))) in binv(X)$ and
+  $
+    norm(A^(-1)) = norm((I - (T^(-1) (T - A)))^(-1)) <= 1/(1 - norm(T^(-1) (T - A)))
+  $
+]
+
 #definition[
   $
     I_N: -> U_N, f |-> sum_(j = 0)^(N'-1) f(t_j + ts) L_ts (x)
@@ -260,11 +271,14 @@ Combining the above lemma with the exact integral values of Fourier basis functi
   Let $phi$ solution of
   $
     phi(s) + sum_(n = 0)^M integral.dash_0^(2 pi) K_n (s, t) cot^n ((s - t)/2) phi(t) dd(t) + sum_(n = 0)^M integral.dash_0^(2 pi) L_n (s, t) log(4 sin^2 ((s - t)/2)) cot^n ((s - t)/2) phi(t) dd(t) = f(s)
-  $
+  $ <ie-original>
   and $phi' in U_N$ solution of
   $
     phi(s) + I_N sum_(n = 0)^M integral.dash_0^(2 pi) K_n (s, t) cot^n ((s - t)/2) phi(t) dd(t) + I_N sum_(n = 0)^M integral.dash_0^(2 pi) L_n (s, t) log(4 sin^2 ((s - t)/2)) cot^n ((s - t)/2) phi(t) dd(t) = I_N f(s)
-  $
+  $ <ie-interpolated>
+  assume that @ie-original is solvable. Then
+  + $exists N_s in NN. norm(T - A) < norm(T^(-1))^(-1)$
+  + $forall N_s ["satisfies above condition"]. forall N >= N_s.$@ie-interpolated has a unique solution
 ]
 
 #theorem[
