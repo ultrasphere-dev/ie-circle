@@ -49,6 +49,10 @@ repos:
     rev: v2.4.2
     hooks:
       - id: codespell
+  - repo: https://github.com/typstyle-rs/pre-commit-typstyle
+    rev: 'v0.14.4'  # The revision or tag you want to use
+    hooks:
+      - id: typstyle
   # - repo: local
   #   hooks:
   #     - id: local-ty
