@@ -11,7 +11,7 @@ from ie_circle._quadrature import (
 )
 
 
-@pytest.mark.parametrize("t_start_factor", [0, 0.5])
+@pytest.mark.parametrize("t_start_factor", [0, 0.3, 0.6])
 @pytest.mark.parametrize("f_case", ["one", "exp1", "combo"])
 def test_kussmaul_martensen_kress_quadrature_exactness(
     xp: Any, device: Any, dtype: Any, t_start_factor: float, f_case: str
@@ -38,7 +38,7 @@ def test_kussmaul_martensen_kress_quadrature_exactness(
     assert xp.abs(approx - expected) < 1e-10
 
 
-@pytest.mark.parametrize("t_start_factor", [0, 0.5])
+@pytest.mark.parametrize("t_start_factor", [0, 0.3, 0.6])
 @pytest.mark.parametrize("f_case", ["one", "exp1", "combo"])
 def test_garrick_wittich_quadrature_exactness(
     xp: Any, device: Any, dtype: Any, t_start_factor: float, f_case: str
@@ -65,7 +65,7 @@ def test_garrick_wittich_quadrature_exactness(
     assert xp.abs(approx - expected) < 1e-10
 
 
-@pytest.mark.parametrize("t_start_factor", [0, 0.5])
+@pytest.mark.parametrize("t_start_factor", [0, 0.3, 0.6])
 @pytest.mark.parametrize("f_case", ["one", "exp1", "combo"])
 def test_trapezoidal_quadrature_exactness(
     xp: Any, device: Any, dtype: Any, t_start_factor: float, f_case: str
