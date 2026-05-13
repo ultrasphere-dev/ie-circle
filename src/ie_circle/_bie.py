@@ -2,6 +2,7 @@ from enum import StrEnum
 from typing import Any, Protocol
 
 from array_api._2024_12 import Array, ArrayNamespaceFull
+from array_api_compat import array_namespace
 from array_api_shape_check import check_shapes
 from batch_tensorsolve import btensorsolve
 
@@ -409,9 +410,9 @@ def nystrom(
             self.sol = sol_values
 
         def __call__(self, x: Array, /) -> Array:
-            xp = array_namespace(x)
+            xp = array_namespace(x, self.sol)
             # (..., Q)
-            trapezoidal_basis(
+            basis_x = trapezoidal_basis(
                 x,
                 n=n,
                 t_start=t_start,
@@ -420,5 +421,8 @@ def nystrom(
                 device=device,
                 dtype=dtype,
             )
+            # (..., *B, Q, C)
+            basis_x = basis_x[..., None, :, :]
+            return xp.sum(self.sol * basis_x, axis=(-1, -2))
 
     return _Interpolant(sol)
