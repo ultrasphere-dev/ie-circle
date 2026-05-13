@@ -167,9 +167,9 @@ def nystrom_lhs(
     # (n_quad, *B, C)
     a_vals = a(x)
     info_a = check_shapes("Q*BC", a_vals, names="a_vals")
-    B_shape = info_a.unique["b"].shape_broadcasted
+    B_shape = info_a.unique["B"].shape_broadcasted
     B_ndim = len(B_shape)
-    C = info_a.unique["c"].shape_broadcasted[-1]
+    C = info_a.unique["C"].shape_broadcasted[-1]
     a_vals_expanded = (
         a_vals[:, None, ..., :, None]
         * xp.eye(n_quad)[(...,) + (None,) * (B_ndim + 2)]
@@ -191,6 +191,7 @@ def nystrom_lhs(
                 device=device,
                 dtype=dtype,
             )
+            w = w[idx_roll]
         elif quad_type == QuadratureType.COT_POWER:
             _, w = cot_power_quadrature(
                 n,
@@ -200,6 +201,7 @@ def nystrom_lhs(
                 device=device,
                 dtype=dtype,
             )
+            w = w[idx_roll]
         else:
             msg = f"Unsupported quadrature type: {quad_type}"  # type: ignore[unreachable]
             raise ValueError(msg)
@@ -207,7 +209,7 @@ def nystrom_lhs(
 
     terms = [
         kernel_fn(x[:, None], y[None, :])
-        * weight_by_key[(quad_type, order)][idx_roll][(...,) + (None,) * (B_ndim + 2)]
+        * weight_by_key[(quad_type, order)][(...,) + (None,) * (B_ndim + 2)]
         for (quad_type, order), kernel_fn in kernel.items()
     ]
 
