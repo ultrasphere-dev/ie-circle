@@ -11,11 +11,11 @@ from ie_circle._example import example_13_19, example_13_19_answer
 
 @pytest.mark.parametrize("a", [3.0, 5.0])
 @pytest.mark.parametrize("b", [1.0, 2.0])
-@pytest.mark.parametrize("n_nodes", [32])
+@pytest.mark.parametrize("n", [32])
 def test_example_13_19_different_t_start(
     a: float,
     b: float,
-    n_nodes: int,
+    n: int,
     xp: ArrayNamespaceFull,
     device: Any,
     dtype: Any,
@@ -23,7 +23,7 @@ def test_example_13_19_different_t_start(
     interpolant_0 = example_13_19(
         a,
         b,
-        n_nodes,
+        n,
         xp=xp,
         device=device,
         dtype=dtype,
@@ -33,7 +33,7 @@ def test_example_13_19_different_t_start(
     interpolant_03 = example_13_19(
         a,
         b,
-        n_nodes,
+        n,
         xp=xp,
         device=device,
         dtype=dtype,
@@ -43,9 +43,9 @@ def test_example_13_19_different_t_start(
     assert xp.all(
         xpx.isclose(
             interpolant_0(
-                trapezoidal_quadrature(
-                    n_nodes, xp=xp, device=device, dtype=dtype, t_start_factor=0.3
-                )[0][:3]
+                trapezoidal_quadrature(n, xp=xp, device=device, dtype=dtype, t_start_factor=0.3)[0][
+                    :3
+                ]
             ),
             interpolant_03.sol[:3],
         )
@@ -54,13 +54,13 @@ def test_example_13_19_different_t_start(
 
 @pytest.mark.parametrize("a", [3.0, 5.0])
 @pytest.mark.parametrize("b", [1.0, 2.0])
-@pytest.mark.parametrize("n_nodes", [32, 64])
+@pytest.mark.parametrize("n", [32, 64])
 @pytest.mark.parametrize("t_start_factor_quadrature", [0.0, 0.3, 0.6])
 @pytest.mark.parametrize("t_start_factor", [0.0, 0.3, 0.6])
 def test_example_13_19(
     a: float,
     b: float,
-    n_nodes: int,
+    n: int,
     xp: ArrayNamespaceFull,
     device: Any,
     dtype: Any,
@@ -70,7 +70,7 @@ def test_example_13_19(
     interpolant = example_13_19(
         a,
         b,
-        n_nodes,
+        n,
         xp=xp,
         device=device,
         dtype=dtype,
