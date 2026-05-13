@@ -142,3 +142,105 @@ def example_13_19(
         t_start=t_start,
         t_start_factor=t_start_factor,
     )
+
+
+def example_simple(
+    n: int,
+    /,
+    *,
+    xp: ArrayNamespaceFull,
+    device: Any = None,
+    dtype: Any = None,
+    t_start_quadrature: float | None = None,
+    t_start_factor_quadrature: float | None = None,
+    t_start: float | None = None,
+    t_start_factor: float | None = None,
+) -> NystromInterpolant:
+    r"""
+    Solves the simple test integral equation.
+
+    $$
+    \phi(t) + \int_0^{2\pi} \cos(t - \tau) \phi(\tau) \, d\tau = (1 + \pi) \cos(t)
+    $$
+
+    The exact solution is
+
+    $$
+    \phi(t) = \text{example\_simple\_answer}(t) = \cos(t).
+    $$
+
+    Parameters
+    ----------
+    n : int
+        The maximum order - 1.
+    xp : ArrayNamespaceFull
+        The array namespace.
+    device : Any, optional
+        The device.
+    dtype : Any, optional
+        The dtype.
+    t_start_quadrature : float | None
+        Grid shift $t_\mathrm{start}$.
+        Applied to column points.
+    t_start_factor_quadrature : float | None
+        Grid shift as a multiple of $h = 2\pi/(2n-1)$.
+        Applied to column points.
+    t_start : float | None
+        Grid shift $t_\mathrm{start}$.
+        Applied to row points.
+    t_start_factor : float | None
+        Grid shift as a multiple of $h = 2\pi/(2n-1)$.
+        Applied to row points.
+
+    Returns
+    -------
+    NystromInterpolant
+        The interpolant for the solution of the integral equation.
+
+    """
+
+    def f(t: Array, /) -> Array:
+        return ((1 + math.pi) * xp.cos(t))[..., None]
+
+    def a_func(t: Array, /) -> Array:
+        return xp.ones_like(t)[..., None]
+
+    def k_reg(t: Array, tau: Array, /) -> Array:
+        return xp.cos(t - tau)[..., None, None]
+
+    kernel = {
+        (QuadratureType.NO_SINGULARITY, 0): k_reg,
+    }
+
+    return nystrom(
+        a_func,
+        kernel,
+        f,
+        n=n,
+        xp=xp,
+        device=device,
+        dtype=dtype,
+        t_start_quadrature=t_start_quadrature,
+        t_start_factor_quadrature=t_start_factor_quadrature,
+        t_start=t_start,
+        t_start_factor=t_start_factor,
+    )
+
+
+def example_simple_answer(t: Array, /) -> Array:
+    r"""
+    Returns the exact solution of the simple test integral equation.
+
+    Parameters
+    ----------
+    t : Array
+        The evaluation points of shape (...,).
+
+    Returns
+    -------
+    Array
+        The exact solution $\phi(t) = \cos(t)$ of shape (...,).
+
+    """
+    xp = array_namespace(t)
+    return xp.cos(t)
