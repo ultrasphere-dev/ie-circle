@@ -310,7 +310,9 @@ def trapezoidal_basis(
         The basis evaluated at x of shape (..., n).
 
     """
-    t, _ = trapezoidal_quadrature(n, xp=xp, device=device, dtype=dtype, t_start=t_start)
+    t, _ = trapezoidal_quadrature(
+        n, xp=xp, device=device, dtype=dtype, t_start=t_start, t_start_factor=t_start_factor
+    )
     n_quad = 2 * n - 1
     m = xp.arange(-(n - 1), n, device=device)
     return (
@@ -322,11 +324,12 @@ def nystrom(
     a: ArrayFunction,
     kernel: Kernel,
     rhs: ArrayFunction,
+    /,
+    *,
     n: int,
     xp: ArrayNamespaceFull,
     device: Any,
     dtype: Any,
-    *,
     t_start_quadrature: float | None = None,
     t_start_factor_quadrature: float | None = None,
     t_start: float | None = None,
@@ -397,7 +400,9 @@ def nystrom(
         device=device,
         dtype=dtype,
         t_start_quadrature=t_start_quadrature,
+        t_start_factor_quadrature=t_start_factor_quadrature,
         t_start=t_start,
+        t_start_factor=t_start_factor,
     )
     b = nystrom_rhs(
         rhs, n=n, xp=xp, device=device, dtype=dtype, t_start=t_start, t_start_factor=t_start_factor

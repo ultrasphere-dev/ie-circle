@@ -29,7 +29,7 @@ def example_13_19_answer(t: Array, /) -> Array:
 def example_13_19(
     a: float,
     b: float,
-    n_nodes: int,
+    n: int,
     /,
     *,
     xp: ArrayNamespaceFull,
@@ -68,8 +68,8 @@ def example_13_19(
         The parameter a.
     b : float
         The parameter b.
-    n_nodes : int
-        The number of nodes $n$.
+    n : int
+        The maximum order - 1.
     xp : ArrayNamespaceFull
         The array namespace.
     device : Any, optional
@@ -114,10 +114,10 @@ def example_13_19(
     }
 
     return nystrom(
-        a=a_func,
-        kernel=kernel,
-        rhs=f,
-        n=n_nodes,
+        a_func,
+        kernel,
+        f,
+        n=n,
         xp=xp,
         device=device,
         dtype=dtype,
