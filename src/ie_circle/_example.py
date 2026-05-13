@@ -35,6 +35,10 @@ def example_13_19(
     xp: ArrayNamespaceFull,
     device: Any = None,
     dtype: Any = None,
+    t_start_quadrature: float | None = None,
+    t_start_factor_quadrature: float | None = None,
+    t_start: float | None = None,
+    t_start_factor: float | None = None,
 ) -> NystromInterpolant:
     r"""
     Solves the integral equation.
@@ -76,6 +80,18 @@ def example_13_19(
         The device.
     dtype : Any, optional
         The dtype.
+    t_start_quadrature : float | None
+        Grid shift $t_\mathrm{start}$.
+        Applied to column points.
+    t_start_factor_quadrature : float | None
+        Grid shift as a multiple of $h = 2\pi/(2n-1)$.
+        Applied to column points.
+    t_start : float | None
+        Grid shift $t_\mathrm{start}$.
+        Applied to row points.
+    t_start_factor : float | None
+        Grid shift as a multiple of $h = 2\pi/(2n-1)$.
+        Applied to row points.
 
     Returns
     -------
@@ -121,4 +137,8 @@ def example_13_19(
         xp=xp,
         device=device,
         dtype=dtype,
+        t_start_quadrature=t_start_quadrature,
+        t_start_factor_quadrature=t_start_factor_quadrature,
+        t_start=t_start,
+        t_start_factor=t_start_factor,
     )
