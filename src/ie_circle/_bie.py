@@ -1,6 +1,6 @@
 from enum import StrEnum
 from typing import Any, Protocol
-import array_api_extra as xpx
+
 from array_api._2024_12 import Array, ArrayNamespaceFull
 from array_api_compat import array_namespace
 from array_api_shape_check import check_shapes
@@ -124,7 +124,7 @@ def nystrom_lhs(
         of (...) -> (..., ...(B), C)
         where C is the number of circles
         and B is the batch shape for equations.
-    kernel : Kernel
+    kernels : Kernel
         Kernel functions keyed by ``(QuadratureType, order)``
         of shape (...), (...) -> (..., ...(B), C(x), C(y))
         where C is the number of circles
@@ -206,7 +206,7 @@ def nystrom_lhs(
         else:
             msg = f"Unsupported quadrature type: {quad_type}"  # type: ignore[unreachable]
             raise ValueError(msg)
-        
+
         # (Q, Q, *B, C(x), C(y))
         kernel_val = kernel(x[:, None], y[None, :])
         check_shapes(
@@ -214,10 +214,9 @@ def nystrom_lhs(
             kernel_val,
             w,
             (n_quad, *B_shape, C),
-            names=f"kernels[{quad_type}{ order}],w,none"
+            names=f"kernels[{quad_type}{order}],w,none",
         )
         A_terms.append(kernel_val * w[(...,) + (None,) * (B_ndim + 2)])
-
 
     A_terms = xp.broadcast_arrays(*A_terms)
     # (Q(x), Q(y), *B, C(x), C(y))
@@ -332,7 +331,7 @@ def trapezoidal_basis(
 
 def nystrom(
     a: ArrayFunction,
-    kernel: Kernels,
+    kernels: Kernels,
     rhs: ArrayFunction,
     /,
     *,
@@ -365,7 +364,7 @@ def nystrom(
         of (...) -> (..., ...(B), C)
         where C is the number of circles
         and B is the batch shape for equations.
-    kernel : Kernel
+    kernels : Kernel
         Kernel functions keyed by ``(QuadratureType, order)``
         of shape (...), (...) -> (..., ...(B), C(x), C(y))
         where C is the number of circles
@@ -404,7 +403,7 @@ def nystrom(
     """
     A = nystrom_lhs(
         a,
-        kernel,
+        kernels,
         n=n,
         xp=xp,
         device=device,
@@ -417,9 +416,14 @@ def nystrom(
     b = nystrom_rhs(
         rhs, n=n, xp=xp, device=device, dtype=dtype, t_start=t_start, t_start_factor=t_start_factor
     )
-    info = check_shapes("*BQCQC,*BQC",A,b,)
+    info = check_shapes(
+        "*BQCQC,*BQC",
+        A,
+        b,
+    )
+    B_ndim = len(info.unique["B"].shape_broadcasted)
     # (*B, Q, C)
-    sol = btensorsolve(A, b, num_batch_axes=len(info.unique["B"].shape_broadcasted))
+    sol = btensorsolve(A, b, num_batch_axes=B_ndim)
 
     class _Interpolant:
         def __init__(self, sol_values: Array) -> None:
@@ -438,7 +442,8 @@ def nystrom(
                 dtype=dtype,
             )
             # (..., *B, Q, C)
-            basis_x = basis_x[..., None, :, :]
+            basis_x = basis_x[(...,) + (None,) * B_ndim + (slice(None), None)]
+            check_shapes("...*BQC,*BQC", basis_x, self.sol, names="basis_x,sol")
             return xp.sum(self.sol * basis_x, axis=(-1, -2))
 
     return _Interpolant(sol)
