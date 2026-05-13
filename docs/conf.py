@@ -28,6 +28,8 @@ extensions = [
     "sphinx.ext.napoleon",
     "sphinx.ext.autodoc",
     "sphinx.ext.viewcode",
+    "sphinx.ext.mathjax",
+    "sphinx_math_dollar",
 ]
 napoleon_google_docstring = False
 

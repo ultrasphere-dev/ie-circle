@@ -43,17 +43,21 @@ repos:
     rev: v0.15.12
     hooks:
       - id: ruff-check
-        args: [--fix, --exit-non-zero-on-fix]
+        args: [--fix, --exit-non-zero-on-fix, --unsafe-fixes]
       - id: ruff-format
   - repo: https://github.com/codespell-project/codespell
     rev: v2.4.2
     hooks:
       - id: codespell
-  - repo: local
+  - repo: https://github.com/typstyle-rs/pre-commit-typstyle
+    rev: 'v0.14.4'  # The revision or tag you want to use
     hooks:
-      - id: local-ty
-        name: ty check
-        entry: uv run ty check
-        require_serial: true
-        language: system
-        pass_filenames: false
+      - id: typstyle
+  # - repo: local
+  #   hooks:
+  #     - id: local-ty
+  #       name: ty check
+  #       entry: uv run --group docs ty check
+  #       require_serial: true
+  #       language: system
+  #       pass_filenames: false
