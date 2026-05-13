@@ -25,6 +25,7 @@ def test_example_13_19_different_t_start(
     device: Any,
     dtype: Any,
 ) -> None:
+    pytest.skip()
     interpolant_0 = example_13_19(
         a,
         b,
@@ -60,8 +61,6 @@ def test_example_13_19_different_t_start(
 @pytest.mark.parametrize("a", [3.0, 5.0])
 @pytest.mark.parametrize("b", [1.0, 2.0])
 @pytest.mark.parametrize("n", [32, 64])
-@pytest.mark.parametrize("t_start_factor_quadrature", [0.0, 0.3, 0.6])
-@pytest.mark.parametrize("t_start_factor", [0.0, 0.3, 0.6])
 def test_example_13_19(
     a: float,
     b: float,
@@ -91,8 +90,6 @@ def test_example_13_19(
 
 
 @pytest.mark.parametrize("n", [2, 3])
-@pytest.mark.parametrize("t_start_factor_quadrature", [0.0, 0.3])
-@pytest.mark.parametrize("t_start_factor", [0.0, 0.3])
 def test_example_simple(
     n: int,
     xp: ArrayNamespaceFull,

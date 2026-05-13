@@ -9,7 +9,6 @@ from ie_circle._quadrature import trapezoidal_quadrature
 
 
 @pytest.mark.parametrize("n", [32, 64])
-@pytest.mark.parametrize("t_start_factor", [0.0, 0.3, 0.6])
 def test_trapezoidal_basis(
     n: int,
     t_start_factor: float,

@@ -1,6 +1,7 @@
 from enum import StrEnum
 from typing import Any, Protocol
 
+import array_api_extra as xpx
 from array_api._2024_12 import Array, ArrayNamespaceFull
 from array_api_compat import array_namespace
 from array_api_shape_check import check_shapes
@@ -167,6 +168,10 @@ def nystrom_lhs(
         device=device,
         dtype=dtype,
     )
+    if not xp.all(xpx.isclose(x, y)):
+        raise NotImplementedError(
+            "Currently only supports the case where row and column points are the same."
+        )
     n_quad = 2 * n - 1
     idx_roll = (
         xp.arange(n_quad, device=device, dtype=xp.int64)[:, None]
