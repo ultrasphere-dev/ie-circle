@@ -143,7 +143,7 @@ The below thorem is used everywhere.
 
 #theorem[Estimates for $I_(m,n), J_(m,n)$][
   + $forall m in ZZ without {0}. forall n in NN_0. abs(I_(m,n)) <= 2 pi n abs(m)^(n-1)$
-  - $abs(J_(m,n)) <= 2 pi n^2 abs(m)^(n-1)$
+  + $forall m in ZZ without {0}. forall n in NN_0. abs(J_(m,n)) <= 2 pi (n + 1)^2 abs(m)^(n)$
 ]
 #proof[
   Proved by induction for $n$
@@ -151,8 +151,13 @@ The below thorem is used everywhere.
     - $n = 0$: $abs(I_(m, 0)) = 0$
     - $n = 1$: $abs(I_(m, 1)) = 2 pi$
     - $n > 1$: $abs(I_(m, n)) = abs((2 i m)/(n-1) I_(m, n-1) - I_(m, n-2)) <= (2 abs(m))/(n - 1) abs(I_(m,n-1)) + abs(I_(m,n-2)) <= (2 abs(m))/(n - 1) dot 2 pi (n - 1) abs(m)^(n - 2) + 2 pi (n - 2) abs(m)^(n - 3) <= 4 pi abs(m)^(n - 1) + 2 pi (n - 2) abs(m)^(n - 3) <= 2 pi n abs(m)^(n - 1)$
+  + $J_(m,n)$
+    - $n = 0$: $abs(J_(m, 0)) = (2 pi)/abs(m) <= 2 pi$
+    - $n = 1$: $abs(J_(m, 1)) = 2 pi abs(2 H_(abs(m)) - 1/abs(m)) <= 8 pi abs(m)$
+    - $n > 1$: $abs(J_(m,n)) = abs((2 i m)/(n-1) J_(m,n-1) - J_(m,n-2) + 2/(n-1) I_(m,n)) <= (2 abs(m))/(n - 1) abs(J_(m, n-1)) + abs(J_(m, n-2)) + 2/(n - 1) abs(I_(m, n)) <= (2 abs(m))/(n - 1) dot 4 pi n^2 abs(m)^(n - 1) + 4 pi (n-1)^2 abs(m)^(n - 2) + 4 pi n/(n - 1) abs(m)^(n - 1) <= 4 pi (2 n + (n - 1)^2 + 2) abs(m)^n = 4 pi (n^2 + 1) abs(m)^n <= 4 pi (n + 1)^2 abs(m)^n$
 ]
-
+// - $n = 2$: $<= 4 pi (2 (n - 1) + 1 + 2) abs(m)^(n - 1) = 4 pi 5 abs(m)^(n - 1) <= 4 pi n^2 abs(m)^n$
+// - $n > 2$:$
 == Subspace $U_N$
 
 #lemma[
