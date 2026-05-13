@@ -140,6 +140,19 @@ The below thorem is used everywhere.
       = (2 pi) sum_(k, l in ZZ without {0}, k + l + m = 0) 1/(abs(k) abs(l)) = (2 pi) sum_(k in ZZ without {0}, l in ZZ, k + l + m = 0) 1/(abs(k) abs(l)) = (2 pi) sum_(k in ZZ without {0, -m}) 1/(abs(k) abs(m + k))$
     - $forall m in NN. sum_(k in ZZ without {0, -m}) 1/(abs(k) abs(m + k)) = sum_(k = 1)^(infinity) 1/(k (m + k)) + sum_(k = -m + 1)^(-1) 1/(abs(k) abs(m + k)) + sum_(k = -infinity)^(- m + 1) 1/(abs(k) abs(m + k)) = sum_(k = 1)^(infinity) 1/(k (m + k)) + sum_(k = 1)^(m - 1) 1/(k (m - k)) + sum_(k = 1)^(infinity) 1/(k (m + k)) = 2/m sum_(k = 1)^(infinity) (1/k - 1/(m + k)) + 1/m sum_(k = 1)^(m - 1) (1/k + 1/(m - k)) = 2/m (sum_(k = 1)^m 1/k + sum_(k = 1)^(m - 1) 1/k) = 2/m (2 H_m - 1/m)$
 ]
+
+#theorem[Estimates for $I_(m,n), J_(m,n)$][
+  + $forall m in ZZ without {0}. forall n in NN_0. abs(I_(m,n)) <= 2 pi n abs(m)^(n-1)$
+  - $abs(J_(m,n)) <= 2 pi n^2 abs(m)^(n-1)$
+]
+#proof[
+  Proved by induction for $n$
+  + $I_(m,n)$
+    - $n = 0$: $abs(I_(m, 0)) = 0$
+    - $n = 1$: $abs(I_(m, 1)) = 2 pi$
+    - $n > 1$: $abs(I_(m, n)) = abs((2 i m)/(n-1) I_(m, n-1) - I_(m, n-2)) <= (2 abs(m))/(n - 1) abs(I_(m,n-1)) + abs(I_(m,n-2)) <= (2 abs(m))/(n - 1) dot 2 pi (n - 1) abs(m)^(n - 2) + 2 pi (n - 2) abs(m)^(n - 3) <= 4 pi abs(m)^(n - 1) + 2 pi (n - 2) abs(m)^(n - 3) <= 2 pi n abs(m)^(n - 1)$
+]
+
 == Subspace $U_N$
 
 #lemma[
