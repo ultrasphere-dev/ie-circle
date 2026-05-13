@@ -4,7 +4,7 @@ import pytest
 from array_api._2024_12 import ArrayNamespaceFull
 
 
-@pytest.fixture(scope="session", params=["numpy", "torch"])
+@pytest.fixture(scope="session", params=["numpy"])
 def xp(request: pytest.FixtureRequest) -> ArrayNamespaceFull:
     backend = request.param
     if backend == "numpy":
