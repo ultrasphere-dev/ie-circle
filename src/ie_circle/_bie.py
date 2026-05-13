@@ -416,11 +416,7 @@ def nystrom(
     b = nystrom_rhs(
         rhs, n=n, xp=xp, device=device, dtype=dtype, t_start=t_start, t_start_factor=t_start_factor
     )
-    info = check_shapes(
-        "*BQCQC,*BQC",
-        A,
-        b,
-    )
+    info = check_shapes("*BQCQC,*BQC", A, b)
     B_ndim = len(info.unique["B"].shape_broadcasted)
     # (*B, Q, C)
     sol = btensorsolve(A, b, num_batch_axes=B_ndim)
