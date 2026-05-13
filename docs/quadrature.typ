@@ -189,6 +189,12 @@ Now we consider the way to express discrete Fourier expansion of a function in $
   $
 ]
 
+#definition[Lagrange basis][
+  $
+  L_ts (x) := 1/N' sum_(abs(m) < N) e^(- i m (t_j + ts)) e^(i m x)
+  $
+]
+
 Combining the above lemma with the exact integral values of Fourier basis functions, we can exactly compute the integrals of functions in $U_N$ multiplied by $cot^n (t/2)$ or $log(4 sin^2 (t/2)) cot^n (t/2)$, by using only the values of the function at $ts, ts + (2 pi)/N', ts + (4 pi)/N', ...$.
 
 #theorem[Generalized Garrick--Wittich quadrature for $U_N$][
@@ -197,7 +203,7 @@ Combining the above lemma with the exact integral values of Fourier basis functi
     integral.dash_0^(2 pi) f(t) cot^n (t/2) dd(t) = sum_(j=0)^(N'-1) f(t_j + ts) P_j^(N',n)
   $
   $
-  P_j^(N',n) := 1/N' sum_(abs(m) < N) I_(m,n) e^(- i m (t_j + ts))
+  P_j^(N',n,ts) := 1/N' sum_(abs(m) < N) I_(m,n) e^(- i m (t_j + ts))
   $
 ]
 #theorem[Generalized Kussmaul--Martensen (Kress) quadrature for $U_N$][
@@ -206,7 +212,7 @@ Combining the above lemma with the exact integral values of Fourier basis functi
     integral.dash_0^(2 pi) f(t) log(4 sin^2 (t/2)) cot^n (t/2) dd(t) = sum_(j=0)^(N'-1) f(t_j + ts) Q_j^(N',n)
   $
   $
-  Q_j^(N',n) := 1/N' sum_(abs(m) < N) J_(m,n) e^(- i m (t_j + ts))
+  Q_j^(N',n,ts) := 1/N' sum_(abs(m) < N) J_(m,n) e^(- i m (t_j + ts))
   $
 ]
 
@@ -214,9 +220,34 @@ Combining the above lemma with the exact integral values of Fourier basis functi
 
 = Integral Equations
 
+#definition[
+  $
+  I_N: -> U_N, f |-> sum_(j = 0)^(N'-1) f(t_j + ts) L_ts (x)
+  $
+]
+
 #theorem[
+  Let $phi$ solution of
   $
   phi(s) + sum_(n = 0)^M integral.dash_0^(2 pi) K_n (s, t) cot^n ((s - t)/2) phi(t) dd(t) + sum_(n = 0)^M integral.dash_0^(2 pi) L_n (s, t) log(4 sin^2 ((s - t)/2)) cot^n ((s - t)/2) phi(t) dd(t) = f(s)
+  $
+  and $phi' in U_N$ solution of
+  $
+  phi(s) + I_N sum_(n = 0)^M integral.dash_0^(2 pi) K_n (s, t) cot^n ((s - t)/2) phi(t) dd(t) + I_N sum_(n = 0)^M integral.dash_0^(2 pi) L_n (s, t) log(4 sin^2 ((s - t)/2)) cot^n ((s - t)/2) phi(t) dd(t) = I_N f(s)
+  $
+]
+
+#theorem[
+$
+  phi(t_j + ts)  + sum_(n = 0)^M sum_(k=0)^(N'-1) K_n (t_j + ts, t_k + ts') P_j^(N',n,ts') phi(t_k + ts') \
+  + sum_(n = 0)^M sum_(k=0)^(N'-1) L_n (t_j + ts, t_k + ts') Q_j^(N',n,ts') phi(t_k + ts') = f(t_j + ts)
+  $
+]
+#proof[
+
+  $
+  phi(t_j + ts)  + sum_(n = 0)^M sum_(k=0)^(N'-1) K_n (t_j + ts, t_k + ts') P_j^(N',n,ts') phi(t_k + ts') \
+  + sum_(n = 0)^M sum_(k=0)^(N'-1) L_n (t_j + ts, t_k + ts') Q_j^(N',n,ts') phi(t_k + ts') = f(t_j + ts)
   $
 ]
 
