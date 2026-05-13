@@ -1,5 +1,6 @@
 from typing import Any
 
+import array_api_extra as xpx
 import pytest
 from array_api.latest import ArrayNamespaceFull
 
@@ -24,4 +25,4 @@ def test_trapezoidal_basis(
     )
     expected = xp.eye(2 * n - 1, device=device, dtype=xp.result_type(dtype, 1j))
     assert actual.shape == (2 * n - 1, 2 * n - 1)
-    assert xp.all(xp.isclose(actual, expected))
+    assert xp.all(xpx.isclose(actual, expected))
