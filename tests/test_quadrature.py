@@ -86,5 +86,5 @@ def test_trapezoidal_quadrature_exactness(
         f = xp.ones_like(t) + xp.exp(1j * 3 * t) + xp.exp(-1j * 4 * t)
         expected = two_pi  # Nonzero modes integrate to 0; only the constant term remains.
 
-    approx = w * xp.sum(f)
+    approx = xp.sum(w * f)
     assert xp.abs(approx - expected) < 1e-10

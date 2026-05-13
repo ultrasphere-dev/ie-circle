@@ -1,6 +1,6 @@
 from enum import StrEnum
 from typing import Any, Protocol
-
+import array_api_extra as xpx
 from array_api._2024_12 import Array, ArrayNamespaceFull
 from array_api_compat import array_namespace
 from array_api_shape_check import check_shapes
@@ -88,12 +88,12 @@ class NystromInterpolant(Protocol):
         ...
 
 
-Kernel = dict[tuple[QuadratureType, int], KernelFunction]
+Kernels = dict[tuple[QuadratureType, int], KernelFunction]
 
 
 def nystrom_lhs(
     a: ArrayFunction,
-    kernel: Kernel,
+    kernels: Kernels,
     *,
     n: int,
     xp: ArrayNamespaceFull,
@@ -156,7 +156,7 @@ def nystrom_lhs(
         The left-hand side matrix $A$ of shape (...(B), Q(x), C(x), Q(y), C(y)).
 
     """
-    x, w = trapezoidal_quadrature(n, t_start=t_start, xp=xp, device=device, dtype=dtype)
+    x, _ = trapezoidal_quadrature(n, t_start=t_start, xp=xp, device=device, dtype=dtype)
     y, _ = trapezoidal_quadrature(n, t_start=t_start_quadrature, xp=xp, device=device, dtype=dtype)
     n_quad = 2 * n - 1
     idx_roll = (
@@ -176,12 +176,13 @@ def nystrom_lhs(
         * xp.eye(C)[(None,) * (B_ndim + 2) + (...,)]
     )
 
-    weight_by_key: dict[tuple[QuadratureType, int], Array] = {}
-    for quad_type, order in kernel:
+    A_terms = [a_vals_expanded]
+    for (quad_type, order), kernel in kernels.items():
         if quad_type == QuadratureType.NO_SINGULARITY:
             _, w = trapezoidal_quadrature(
                 n, t_start=t_start_quadrature, xp=xp, device=device, dtype=dtype
             )
+            w = w[None]
         elif quad_type == QuadratureType.LOG_COT_POWER:
             _, w = log_cot_power_quadrature(
                 n,
@@ -205,18 +206,24 @@ def nystrom_lhs(
         else:
             msg = f"Unsupported quadrature type: {quad_type}"  # type: ignore[unreachable]
             raise ValueError(msg)
-        weight_by_key[(quad_type, order)] = w
+        
+        # (Q, Q, *B, C(x), C(y))
+        kernel_val = kernel(x[:, None], y[None, :])
+        check_shapes(
+            "QQ*BCC,QQ,Q*BC",
+            kernel_val.shape,
+            w.shape,
+            (n_quad, *B_shape, C),
+        )
+        A_terms.append(kernel_val * w[(...,) + (None,) * (B_ndim + 2)])
 
-    terms = [
-        kernel_fn(x[:, None], y[None, :])
-        * weight_by_key[(quad_type, order)][(...,) + (None,) * (B_ndim + 2)]
-        for (quad_type, order), kernel_fn in kernel.items()
-    ]
 
+    A_terms = xp.broadcast_arrays(*A_terms)
     # (Q(x), Q(y), *B, C(x), C(y))
-    A = a_vals_expanded + xp.sum(xp.stack(terms), axis=0)
-    # (*B, Q(x), C(x), Q(y), C(y))
+    A = xp.sum(xp.stack(A_terms, axis=0), axis=0)
+    # -> (Q(y), *B, Q(x), C(x), C(y))
     A = xp.moveaxis(A, 0, -3)
+    # -> (*B, Q(x), C(x), Q(y), C(y))
     A = xp.moveaxis(A, 1, -2)
     return A
 
@@ -324,7 +331,7 @@ def trapezoidal_basis(
 
 def nystrom(
     a: ArrayFunction,
-    kernel: Kernel,
+    kernel: Kernels,
     rhs: ArrayFunction,
     /,
     *,
