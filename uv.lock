@@ -59,7 +59,7 @@ wheels = [
 
 [[package]]
 name = "array-api-shape-check"
-version = "0.1.2"
+version = "0.1.3"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "attrs" },
@@ -67,9 +67,9 @@ dependencies = [
     { name = "numpy" },
     { name = "types-array-api" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/0f/27/52a6b47265e9d613e5b6a761c5916952baa226daea062fbbc3b42df8e801/array_api_shape_check-0.1.2.tar.gz", hash = "sha256:5e6a2e5c65627eede40372836f0cb59b12bd2bf63a75ade3a9d1d67ee2bf830f", size = 10349, upload-time = "2026-05-11T12:32:51.076Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/67/81/8732832017719199207b556cb1b65452b3a56985f7dcc0c77bf0803eb4cc/array_api_shape_check-0.1.3.tar.gz", hash = "sha256:345d56dcf9155dff338c248e558841d45dbeb3ba5456322335af6fd094b80606", size = 10471, upload-time = "2026-05-13T02:12:38.379Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/7c/26/e09e56655dd259a00ff7fb4ce1ae5956dae6d4b3ed91e75b3bf0e1d10e6b/array_api_shape_check-0.1.2-py3-none-any.whl", hash = "sha256:ee7486f5a25acf5e9bc72387c65c64993f604515fe77dce6989ff799ade20b2c", size = 8499, upload-time = "2026-05-11T12:32:49.637Z" },
+    { url = "https://files.pythonhosted.org/packages/83/07/38fc496989e7eac9cb63f52988a6653bedf9a3a11fbdce80b4282d54d131/array_api_shape_check-0.1.3-py3-none-any.whl", hash = "sha256:778feb8ef2e71aa436de940a7bec3c5d82f5aa0a17daf57dfb4a339a3770104b", size = 8606, upload-time = "2026-05-13T02:12:37.201Z" },
 ]
 
 [[package]]
@@ -478,7 +478,7 @@ docs = [
 [package.metadata]
 requires-dist = [
     { name = "array-api-compat", specifier = ">=1.14" },
-    { name = "array-api-shape-check", specifier = ">=0.1.2" },
+    { name = "array-api-shape-check", specifier = ">=0.1.3" },
     { name = "attrs", specifier = ">=26.1" },
     { name = "batch-tensorsolve", specifier = ">=1.0.2" },
     { name = "numpy", specifier = ">=2.4.4" },

@@ -211,9 +211,10 @@ def nystrom_lhs(
         kernel_val = kernel(x[:, None], y[None, :])
         check_shapes(
             "QQ*BCC,QQ,Q*BC",
-            kernel_val.shape,
-            w.shape,
+            kernel_val,
+            w,
             (n_quad, *B_shape, C),
+            names=f"kernels[{quad_type}{ order}],w,none"
         )
         A_terms.append(kernel_val * w[(...,) + (None,) * (B_ndim + 2)])
 
@@ -416,8 +417,9 @@ def nystrom(
     b = nystrom_rhs(
         rhs, n=n, xp=xp, device=device, dtype=dtype, t_start=t_start, t_start_factor=t_start_factor
     )
+    info = check_shapes("*BQCQC,*BQC",A,b,)
     # (*B, Q, C)
-    sol = btensorsolve(A, b, num_batch_axes=2)
+    sol = btensorsolve(A, b, num_batch_axes=len(info.unique["B"].shape_broadcasted))
 
     class _Interpolant:
         def __init__(self, sol_values: Array) -> None:

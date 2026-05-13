@@ -101,12 +101,12 @@ def example_13_19(
         den = (a2 + b2) - (a2 - b2) * xp.cos(t + tau)
 
         k_val = 2.0 - (num / den)
-        return k_val / (2 * math.pi)
+        return (k_val / (2 * math.pi))[..., None, None]
 
     def k_cot(t: Array, tau: Array, /) -> Array:
         val = -1.0 / (2 * math.pi)
         result = xp.zeros_like(t + tau) + val
-        return result
+        return result[..., None, None]
 
     kernel = {
         (QuadratureType.NO_SINGULARITY, 0): k_reg,
