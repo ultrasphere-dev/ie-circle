@@ -5,7 +5,51 @@ import array_api_extra as xpx
 import pytest
 from array_api._2024_12 import ArrayNamespaceFull
 
+from ie_circle import trapezoidal_quadrature
 from ie_circle._example import example_13_19, example_13_19_answer
+
+
+@pytest.mark.parametrize("a", [3.0, 5.0])
+@pytest.mark.parametrize("b", [1.0, 2.0])
+@pytest.mark.parametrize("n_nodes", [32])
+def test_example_13_19_different_t_start(
+    a: float,
+    b: float,
+    n_nodes: int,
+    xp: ArrayNamespaceFull,
+    device: Any,
+    dtype: Any,
+) -> None:
+    interpolant_0 = example_13_19(
+        a,
+        b,
+        n_nodes,
+        xp=xp,
+        device=device,
+        dtype=dtype,
+        t_start_factor_quadrature=0.0,
+        t_start_factor=0.0,
+    )
+    interpolant_03 = example_13_19(
+        a,
+        b,
+        n_nodes,
+        xp=xp,
+        device=device,
+        dtype=dtype,
+        t_start_factor_quadrature=0.3,
+        t_start_factor=0.3,
+    )
+    assert xp.all(
+        xpx.isclose(
+            interpolant_0(
+                trapezoidal_quadrature(
+                    n_nodes, xp=xp, device=device, dtype=dtype, t_start_factor=0.3
+                )[0][:3]
+            ),
+            interpolant_03.sol[:3],
+        )
+    )
 
 
 @pytest.mark.parametrize("a", [3.0, 5.0])

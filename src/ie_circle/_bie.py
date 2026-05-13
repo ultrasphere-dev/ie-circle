@@ -156,8 +156,17 @@ def nystrom_lhs(
         The left-hand side matrix $A$ of shape (...(B), Q(x), C(x), Q(y), C(y)).
 
     """
-    x, _ = trapezoidal_quadrature(n, t_start=t_start, xp=xp, device=device, dtype=dtype)
-    y, _ = trapezoidal_quadrature(n, t_start=t_start_quadrature, xp=xp, device=device, dtype=dtype)
+    x, _ = trapezoidal_quadrature(
+        n, t_start=t_start, t_start_factor=t_start_factor, xp=xp, device=device, dtype=dtype
+    )
+    y, _ = trapezoidal_quadrature(
+        n,
+        t_start=t_start_quadrature,
+        t_start_factor=t_start_factor_quadrature,
+        xp=xp,
+        device=device,
+        dtype=dtype,
+    )
     n_quad = 2 * n - 1
     idx_roll = (
         xp.arange(n_quad, device=device, dtype=xp.int64)[:, None]
@@ -180,7 +189,12 @@ def nystrom_lhs(
     for (quad_type, order), kernel in kernels.items():
         if quad_type == QuadratureType.NO_SINGULARITY:
             _, w = trapezoidal_quadrature(
-                n, t_start=t_start_quadrature, xp=xp, device=device, dtype=dtype
+                n,
+                t_start=t_start_quadrature,
+                t_start_factor=t_start_factor_quadrature,
+                xp=xp,
+                device=device,
+                dtype=dtype,
             )
             w = w[None]
         elif quad_type == QuadratureType.LOG_COT_POWER:
@@ -188,6 +202,7 @@ def nystrom_lhs(
                 n,
                 order,
                 t_start=t_start_quadrature,
+                t_start_factor=t_start_factor_quadrature,
                 xp=xp,
                 device=device,
                 dtype=dtype,
@@ -198,6 +213,7 @@ def nystrom_lhs(
                 n,
                 order,
                 t_start=t_start_quadrature,
+                t_start_factor=t_start_factor_quadrature,
                 xp=xp,
                 device=device,
                 dtype=dtype,
