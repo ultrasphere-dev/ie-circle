@@ -32,6 +32,9 @@ def cot_power_fourier_integral_coefficients(
 
     Returns $I_{m,\mathrm{power}}$ for $m = -(n_harmonics-1), \ldots, n_harmonics-1$.
 
+    If ``power`` is 0, the coefficients are $ 2\pi \delta_{m,0}$
+    corresponding to the Fourier coefficients of the constant function 1.
+
     Parameters
     ----------
     n_harmonics : int

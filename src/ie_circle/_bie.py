@@ -16,8 +16,34 @@ from ._quadrature import (
 
 class QuadratureType(StrEnum):
     NO_SINGULARITY = "no_singularity"
+    r"""
+    $$
+    K_{\mathrm{reg}}(x, y)
+    $$
+    """
     LOG_COT_POWER = "log_cot_power"
+    r"""
+    $$
+    K_{\log,n}(x, y) \log\left(4\sin^2\frac{x - y}{2}\right)\cot^n\!\left(\frac{x - y}{2}\right)
+
+    If ``n`` is odd, be careful about the order of x and y, as
+    $$
+    \cot \left(\frac{x - y}{2}\right) = -\cot \left(\frac{y - x}{2}\right).
+    $$
+    """
     COT_POWER = "cot_power"
+    r"""
+    $$
+    K_{\cot,n}(x, y) \cot^n\!\left(\frac{x - y}{2}\right)
+    $$
+
+    If ``n`` is odd, be careful about the order of x and y, as
+    $$
+    \cot \left(\frac{x - y}{2}\right) = -\cot \left(\frac{y - x}{2}\right).
+    $$
+
+    If ``n`` is 0, same as ``NO_SINGULARITY``.
+    """
 
 
 class KernelFunction(Protocol):
@@ -118,6 +144,11 @@ def nystrom_lhs(
     = \text{rhs} (x)
     $$
 
+    If ``n`` is odd, be careful about the order of x and y, as
+    $$
+    \cot \left(\frac{x - y}{2}\right) = -\cot \left(\frac{y - x}{2}\right).
+    $$
+
     Parameters
     ----------
     a : ArrayFunction
@@ -173,9 +204,15 @@ def nystrom_lhs(
             "Currently only supports the case where row and column points are the same."
         )
     n_quad = 2 * n - 1
+    # Singular qudarature rule should be generated for each singular point y.
+    # However, since if "roll" (minus) the quadrature along the y axis,
+    # the quadrature rule for y=0 can be reused.
+    # S R1 R2 R3 ...
+    # R-1 S R1 R2 ...
+    # R-2 R-1 S R1 ...
     idx_roll = (
         xp.arange(n_quad, device=device, dtype=xp.int64)[:, None]
-        + xp.arange(n_quad, device=device, dtype=xp.int64)[None, :]
+        - xp.arange(n_quad, device=device, dtype=xp.int64)[None, :]
     ) % n_quad
 
     # (n_quad, *B, C)
@@ -212,6 +249,10 @@ def nystrom_lhs(
                 device=device,
                 dtype=dtype,
             )
+            # Currently cot^n ((\tau - t)/2)
+            # Need to flip to cot^n ((t - \tau)/2)
+            # to match the kernel implementation which assumes cot^n ((t - \tau)/2)
+            w *= (-1) ** order
             w = w[idx_roll]
         elif quad_type == QuadratureType.COT_POWER:
             _, w = cot_power_quadrature(
@@ -223,6 +264,10 @@ def nystrom_lhs(
                 device=device,
                 dtype=dtype,
             )
+            # Currently \log(4\sin^2((\tau - t)/2))\cot^n ((\tau - t)/2)
+            # Need to flip to \log(4\sin^2((t - \tau)/2))\cot^n ((t - \tau)/2)
+            # to match the kernel implementation which assumes \log(4\sin^2((t - \tau)/2))
+            w *= (-1) ** order
             w = w[idx_roll]
         else:
             msg = f"Unsupported quadrature type: {quad_type}"  # type: ignore[unreachable]

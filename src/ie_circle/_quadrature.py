@@ -307,6 +307,8 @@ def cot_power_quadrature(
     The returned weights correspond to $P_j^{(N',\mathrm{power})}$ evaluated at
     $t_s = t_\mathrm{start}$, and the returned nodes are $t_j + t_\mathrm{start}$.
 
+    If ``power`` is 0, the quadrature corresponds to the trapezoidal rule.
+
     Parameters
     ----------
     n_harmonics : int
