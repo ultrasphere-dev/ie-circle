@@ -212,22 +212,22 @@ Now we consider the way to express discrete Fourier expansion of a function in $
 ]
 
 #let ip(x, y) = $lr(chevron.l #x, #y chevron.r)$
-#theorem[
-  $forall N in NN. N' := 2 N - 1. forall ts, ts' in [0, 2 pi). forall i, j in {0, ..., N' - 1}. t_i := (2 pi i)/N'. t_j := (2 pi j)/N'.$
-  $
-    ip(L^ts_i, L^(ts')_j) = (2 pi)/N'^2 sum_(abs(m) < N) e^(i m (t_j + ts' - t_i - ts))
-  $
-]
-#proof[
-  $
-    ip(L^ts_i, L^(ts')_j) &=
-    integral_0^(2 pi) L^ts_i (t) overline(L^(ts')_j (t)) dd(t) \
-    &= integral_0^(2 pi) (1/N' sum_(abs(m) < N) e^(- i m (t_i + ts)) e^(i m t)) (1/N' sum_(abs(n) < N) e^(i n (t_j + ts')) e^(- i n t)) dd(t) \
-    &= 1/(N'^2) sum_(abs(m) < N) sum_(abs(n) < N) e^(- i m (t_i + ts)) e^(i n (t_j + ts')) integral_0^(2 pi) e^(i (m - n) t) dd(t) \
-    &= 1/(N'^2) sum_(abs(m) < N) sum_(abs(n) < N) e^(- i m (t_i + ts)) e^(i n (t_j + ts')) delta_(m, n) 2 pi \
-    &=(2 pi)/(N'^2) sum_(abs(m) < N) e^(i m (t_j + ts' - t_i - ts)) \
-  $
-]
+// #theorem[
+//   $forall N in NN. N' := 2 N - 1. forall ts, ts' in [0, 2 pi). forall i, j in {0, ..., N' - 1}. t_i := (2 pi i)/N'. t_j := (2 pi j)/N'.$
+//   $
+//     ip(L^ts_i, L^(ts')_j) = (2 pi)/N'^2 sum_(abs(m) < N) e^(i m (t_j + ts' - t_i - ts))
+//   $
+// ]
+// #proof[
+//   $
+//     ip(L^ts_i, L^(ts')_j) &=
+//     integral_0^(2 pi) L^ts_i (t) overline(L^(ts')_j (t)) dd(t) \
+//     &= integral_0^(2 pi) (1/N' sum_(abs(m) < N) e^(- i m (t_i + ts)) e^(i m t)) (1/N' sum_(abs(n) < N) e^(i n (t_j + ts')) e^(- i n t)) dd(t) \
+//     &= 1/(N'^2) sum_(abs(m) < N) sum_(abs(n) < N) e^(- i m (t_i + ts)) e^(i n (t_j + ts')) integral_0^(2 pi) e^(i (m - n) t) dd(t) \
+//     &= 1/(N'^2) sum_(abs(m) < N) sum_(abs(n) < N) e^(- i m (t_i + ts)) e^(i n (t_j + ts')) delta_(m, n) 2 pi \
+//     &=(2 pi)/(N'^2) sum_(abs(m) < N) e^(i m (t_j + ts' - t_i - ts)) \
+//   $
+// ]
 
 Combining the above lemma with the exact integral values of Fourier basis functions, we can exactly compute the integrals of functions in $U_N$ multiplied by $cot^n (t/2)$ or $log(4 sin^2 (t/2)) cot^n (t/2)$, by using only the values of the function at $ts, ts + (2 pi)/N', ts + (4 pi)/N', ...$.
 
@@ -311,6 +311,31 @@ Combining the above lemma with the exact integral values of Fourier basis functi
   + $forall N_s ["satisfies above condition"]. forall N >= N_s.$@ie-interpolated has a unique solution
 ]
 
+#proof[
+  WIP
+]
+
+// #definition[
+//   $
+//   A_n := phi|-> integral.dash_0^(2 pi) K_n (s, t) cot^n ((s - t)/2) phi(t) dd(t) \
+//   B_n := phi |-> integral.dash_0^(2 pi) L_n (s, t) log(4 sin^2 ((s - t)/2)) cot^n ((s - t)/2) phi(t) dd(t)
+//   $
+// ]
+
+// #theorem[
+//   $forall K_n in C^infinity (CC^2)$.
+//   $norm(A_n - I_N A_n) <=$
+// ]
+// #proof[
+//   $
+//   (A)
+//   $
+// ]
+
+// #theorem[
+//   $norm(phi - dphi) <=$
+// ]
+
 #theorem[
   Let ${dphi_j}_(j = 0)^(N'-1)$ solution of
   $
@@ -323,7 +348,7 @@ Combining the above lemma with the exact integral values of Fourier basis functi
   $
 ]
 #proof[
-  Evaluate @ie-interpolated at $s = t_i + ts$.
+  Evaluate @ie-interpolated at $t_i + ts$.
   $
     sum_(j = 0)^(N' - 1) L_j^(ts')(t_i + ts) dphi_j + sum_(n = 0)^M sum_(j=0)^(N'-1) K_n (t_i + ts, t_j + ts') P_(j-i)^(N',n,ts'-ts) dphi_j \
     + sum_(n = 0)^M (-1)^n sum_(j=0)^(N'-1) L_n (t_i + ts, t_j + ts') Q_(j-i)^(N',n,ts'-ts) dphi_j = f(t_i + ts)
