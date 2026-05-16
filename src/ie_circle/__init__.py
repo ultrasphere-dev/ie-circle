@@ -1,5 +1,14 @@
 __version__ = "0.2.1"
-from ._bie import nystrom, nystrom_lhs, nystrom_rhs
+from ._bie import (
+    ArrayFunction,
+    KernelFunction,
+    Kernels,
+    NystromInterpolant,
+    QuadratureType,
+    nystrom,
+    nystrom_lhs,
+    nystrom_rhs,
+)
 from ._example import example_13_19, example_13_19_answer
 from ._fourier_integral import (
     cot_power_fourier_integral_coefficients,
@@ -20,10 +29,15 @@ from ._quadrature import (
 from ._shape import CircleShape, KressShape, Shape, SympyShape
 
 __all__ = [
+    "ArrayFunction",
     "CircleShape",
+    "KernelFunction",
+    "Kernels",
     "KressShape",
+    "NystromInterpolant",
     "PowerQuadratureRule",
     "QuadratureRule",
+    "QuadratureType",
     "Shape",
     "SympyShape",
     "cot_power_fourier_integral_coefficients",

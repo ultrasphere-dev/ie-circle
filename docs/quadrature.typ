@@ -210,14 +210,17 @@ Now we consider the way to express discrete Fourier expansion of a function in $
   $
 ]
 
+#let ip(x, y) = $lr(chevron.l #x, #y chevron.r)$
 #theorem[
   $
-    integral_0^(2 pi) L^ts_i (t) overline(L^(ts')_j (t)) dd(t) =
+    ip(L^ts_i, L^(ts')_j) = (2 pi)/N' sum_(abs(m) < N) e^(i m (t_j + ts' - t_i - ts))
   $
 ]
 #proof[
   $
-    integral_0^(2 pi) L^ts_i (t) overline(L^(ts')_j (t)) dd(t) &= integral_0^(2 pi) (1/N' sum_(abs(m) < N) e^(- i m (t_i + ts)) e^(i m t)) (1/N' sum_(abs(n) < N) e^(i n (t_j + ts')) e^(- i n t)) dd(t) \
+    ip(L^ts_i, L^(ts')_j) &=
+    integral_0^(2 pi) L^ts_i (t) overline(L^(ts')_j (t)) dd(t) \
+    &= integral_0^(2 pi) (1/N' sum_(abs(m) < N) e^(- i m (t_i + ts)) e^(i m t)) (1/N' sum_(abs(n) < N) e^(i n (t_j + ts')) e^(- i n t)) dd(t) \
     &= 1/(N'^2) sum_(abs(m) < N) sum_(abs(n) < N) e^(- i m (t_i + ts)) e^(i n (t_j + ts')) integral_0^(2 pi) e^(i (m - n) t) dd(t) \
     &= 1/(N'^2) sum_(abs(m) < N) sum_(abs(n) < N) e^(- i m (t_i + ts)) e^(i n (t_j + ts')) delta_(m, n) 2 pi \
     &=(2 pi)/(N'^2) sum_(abs(m) < N) e^(i m (t_j + ts' - t_i - ts)) \
@@ -267,14 +270,15 @@ Combining the above lemma with the exact integral values of Fourier basis functi
   $
 ]
 
+#let dphi = $tilde(phi)^((N))$
 #theorem[
   Let $phi$ solution of
   $
     phi(s) + sum_(n = 0)^M integral.dash_0^(2 pi) K_n (s, t) cot^n ((s - t)/2) phi(t) dd(t) + sum_(n = 0)^M integral.dash_0^(2 pi) L_n (s, t) log(4 sin^2 ((s - t)/2)) cot^n ((s - t)/2) phi(t) dd(t) = f(s)
   $ <ie-original>
-  and $phi' in U_N$ solution of
+  and $dphi in U_N$ solution of
   $
-    phi(s) + I_N sum_(n = 0)^M integral.dash_0^(2 pi) K_n (s, t) cot^n ((s - t)/2) phi(t) dd(t) + I_N sum_(n = 0)^M integral.dash_0^(2 pi) L_n (s, t) log(4 sin^2 ((s - t)/2)) cot^n ((s - t)/2) phi(t) dd(t) = I_N f(s)
+    dphi(s) + I_N sum_(n = 0)^M integral.dash_0^(2 pi) K_n (s, t) cot^n ((s - t)/2) dphi(t) dd(t) + I_N sum_(n = 0)^M integral.dash_0^(2 pi) L_n (s, t) log(4 sin^2 ((s - t)/2)) cot^n ((s - t)/2) dphi(t) dd(t) = I_N f(s)
   $ <ie-interpolated>
   assume that @ie-original is solvable. Then
   + $exists N_s in NN. norm(T - A) < norm(T^(-1))^(-1)$
@@ -282,16 +286,21 @@ Combining the above lemma with the exact integral values of Fourier basis functi
 ]
 
 #theorem[
+  Let ${dphi_j}_(j = 0)^(N'-1)$ solution of
   $
-    phi(t_j + ts) + sum_(n = 0)^M sum_(k=0)^(N'-1) K_n (t_j + ts, t_k + ts') P_j^(N',n,ts') phi(t_k + ts') \
-    + sum_(n = 0)^M sum_(k=0)^(N'-1) L_n (t_j + ts, t_k + ts') Q_j^(N',n,ts') phi(t_k + ts') = f(t_j + ts)
+    sum_(j = 0)^(N'-1) ip(L^ts_i, L^(ts')_j) dphi_j + sum_(n = 0)^M sum_(j=0)^(N'-1) K_n (t_i + ts, t_j + ts') P_j^(N',n,ts') dphi_j \
+    + sum_(n = 0)^M sum_(j=0)^(N'-1) L_n (t_i + ts, t_j + ts') Q_j^(N',n,ts') dphi_j = f(t_i + ts)
+  $
+  Then
+  $
+    dphi = sum_(j = 0)^(N'-1) dphi_j L^ts'_j
   $
 ]
 #proof[
 
   $
-    phi(t_j + ts) + sum_(n = 0)^M sum_(k=0)^(N'-1) K_n (t_j + ts, t_k + ts') P_j^(N',n,ts') phi(t_k + ts') \
-    + sum_(n = 0)^M sum_(k=0)^(N'-1) L_n (t_j + ts, t_k + ts') Q_j^(N',n,ts') phi(t_k + ts') = f(t_j + ts)
+    sum_(j = 0)^(N' - 1) phi(t_i + ts) ip(L_i^ts, L_j^ts') + sum_(n = 0)^M sum_(j=0)^(N'-1) K_n (t_i + ts, t_j + ts') P_j^(N',n,ts') phi(t_j + ts') \
+    + sum_(n = 0)^M sum_(j=0)^(N'-1) L_n (t_i + ts, t_j + ts') Q_j^(N',n,ts') phi(t_j + ts') = f(t_i + ts)
   $
 ]
 
