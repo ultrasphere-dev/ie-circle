@@ -1,4 +1,5 @@
 __version__ = "0.2.1"
+from ._basis import trapezoidal_basis
 from ._bie import (
     ArrayFunction,
     KernelFunction,
@@ -55,5 +56,6 @@ __all__ = [
     "nystrom_lhs",
     "nystrom_rhs",
     "shift_quadrature_singularity",
+    "trapezoidal_basis",
     "trapezoidal_quadrature",
 ]
