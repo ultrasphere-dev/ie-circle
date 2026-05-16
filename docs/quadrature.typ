@@ -292,7 +292,7 @@ Combining the above lemma with the exact integral values of Fourier basis functi
 #theorem[
   Let ${dphi_j}_(j = 0)^(N'-1)$ solution of
   $
-    sum_(j = 0)^(N'-1) ip(L^ts_i, L^(ts')_j) dphi_j + sum_(n = 0)^M sum_(j=0)^(N'-1) K_n (t_i + ts, t_j + ts') P_j^(N',n,ts') dphi_j \
+    sum_(j = 0)^(N'-1) L_j^(ts')(t_i + ts) dphi_j + sum_(n = 0)^M sum_(j=0)^(N'-1) K_n (t_i + ts, t_j + ts') P_j^(N',n,ts') dphi_j \
     + sum_(n = 0)^M sum_(j=0)^(N'-1) L_n (t_i + ts, t_j + ts') Q_j^(N',n,ts') dphi_j = f(t_i + ts)
   $
   Then
@@ -301,10 +301,10 @@ Combining the above lemma with the exact integral values of Fourier basis functi
   $
 ]
 #proof[
-
+  Evaluate @ie-interpolated at $s = t_i + ts$.
   $
-    sum_(j = 0)^(N' - 1) phi(t_i + ts) ip(L_i^ts, L_j^ts') + sum_(n = 0)^M sum_(j=0)^(N'-1) K_n (t_i + ts, t_j + ts') P_j^(N',n,ts') phi(t_j + ts') \
-    + sum_(n = 0)^M sum_(j=0)^(N'-1) L_n (t_i + ts, t_j + ts') Q_j^(N',n,ts') phi(t_j + ts') = f(t_i + ts)
+    sum_(j = 0)^(N' - 1) L_j^(ts')(t_i + ts) dphi_j + sum_(n = 0)^M sum_(j=0)^(N'-1) K_n (t_i + ts, t_j + ts') P_j^(N',n,ts') dphi_j \
+    + sum_(n = 0)^M sum_(j=0)^(N'-1) L_n (t_i + ts, t_j + ts') Q_j^(N',n,ts') dphi_j = f(t_i + ts)
   $
 ]
 
