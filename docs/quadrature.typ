@@ -205,6 +205,7 @@ Now we consider the way to express discrete Fourier expansion of a function in $
 ]
 
 #definition[Lagrange basis][
+  $forall N in NN. N' := 2 N - 1. t_j := (2 pi j)/N'. forall ts in [0, 2 pi).$
   $
     L^ts_j (x) := 1/N' sum_(abs(m) < N) e^(- i m (t_j + ts)) e^(i m x)
   $
@@ -212,8 +213,9 @@ Now we consider the way to express discrete Fourier expansion of a function in $
 
 #let ip(x, y) = $lr(chevron.l #x, #y chevron.r)$
 #theorem[
+  $forall N in NN. N' := 2 N - 1. forall ts, ts' in [0, 2 pi). forall i, j in {0, ..., N' - 1}. t_i := (2 pi i)/N'. t_j := (2 pi j)/N'.$
   $
-    ip(L^ts_i, L^(ts')_j) = (2 pi)/N' sum_(abs(m) < N) e^(i m (t_j + ts' - t_i - ts))
+    ip(L^ts_i, L^(ts')_j) = (2 pi)/N'^2 sum_(abs(m) < N) e^(i m (t_j + ts' - t_i - ts))
   $
 ]
 #proof[
@@ -274,11 +276,13 @@ Combining the above lemma with the exact integral values of Fourier basis functi
 #theorem[
   Let $phi$ solution of
   $
-    phi(s) + sum_(n = 0)^M integral.dash_0^(2 pi) K_n (s, t) cot^n ((s - t)/2) phi(t) dd(t) + sum_(n = 0)^M integral.dash_0^(2 pi) L_n (s, t) log(4 sin^2 ((s - t)/2)) cot^n ((s - t)/2) phi(t) dd(t) = f(s)
+    phi(s) + sum_(n = 0)^M integral.dash_0^(2 pi) K_n (s, t) cot^n ((s - t)/2) phi(t) dd(t) \
+    + sum_(n = 0)^M integral.dash_0^(2 pi) L_n (s, t) log(4 sin^2 ((s - t)/2)) cot^n ((s - t)/2) phi(t) dd(t) = f(s)
   $ <ie-original>
   and $dphi in U_N$ solution of
   $
-    dphi(s) + I_N sum_(n = 0)^M integral.dash_0^(2 pi) K_n (s, t) cot^n ((s - t)/2) dphi(t) dd(t) + I_N sum_(n = 0)^M integral.dash_0^(2 pi) L_n (s, t) log(4 sin^2 ((s - t)/2)) cot^n ((s - t)/2) dphi(t) dd(t) = I_N f(s)
+    dphi(s) + I_N sum_(n = 0)^M integral.dash_0^(2 pi) K_n (s, t) cot^n ((s - t)/2) dphi(t) dd(t) \
+    + I_N sum_(n = 0)^M integral.dash_0^(2 pi) L_n (s, t) log(4 sin^2 ((s - t)/2)) cot^n ((s - t)/2) dphi(t) dd(t) = I_N f(s)
   $ <ie-interpolated>
   assume that @ie-original is solvable. Then
   + $exists N_s in NN. norm(T - A) < norm(T^(-1))^(-1)$
