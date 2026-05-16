@@ -127,7 +127,7 @@ def nystrom_lhs(
     xp: ArrayNamespaceFull,
     device: Any,
     dtype: Any,
-    t_start_quadrature: float | None = None,
+    t_start_sol: float | None = None,
     t_start_factor_quadrature: float | None = None,
     t_start: float | None = None,
     t_start_factor: float | None = None,
@@ -170,7 +170,7 @@ def nystrom_lhs(
         The device.
     dtype : Any
         The dtype.
-    t_start_quadrature : float | None
+    t_start_sol : float | None
         Grid shift $t_\mathrm{start}$.
         Applied to column points.
     t_start_factor_quadrature : float | None
@@ -194,14 +194,14 @@ def nystrom_lhs(
         t_start=t_start,
         t_start_factor=t_start_factor,
     )
-    t_start_quadrature_ = _resolve_t_start(
+    t_start_sol_ = _resolve_t_start(
         n,
-        t_start=t_start_quadrature,
+        t_start=t_start_sol,
         t_start_factor=t_start_factor_quadrature,
     )
-    del t_start, t_start_factor, t_start_quadrature, t_start_factor_quadrature
+    del t_start, t_start_factor, t_start_sol, t_start_factor_quadrature
     x, _ = trapezoidal_quadrature(n, t_start=t_start_, xp=xp, device=device, dtype=dtype)
-    y, _ = trapezoidal_quadrature(n, t_start=t_start_quadrature_, xp=xp, device=device, dtype=dtype)
+    y, _ = trapezoidal_quadrature(n, t_start=t_start_sol_, xp=xp, device=device, dtype=dtype)
     # if not xp.all(xpx.isclose(x, y)):
     #     raise NotImplementedError(
     #         "Currently only supports the case where row and column points are the same."
@@ -234,7 +234,7 @@ def nystrom_lhs(
     basis_y_at_x = trapezoidal_basis(
         x,
         n=n,
-        t_start=t_start_quadrature_,
+        t_start=t_start_sol_,
         xp=xp,
         device=device,
         dtype=dtype,
@@ -246,7 +246,7 @@ def nystrom_lhs(
         if quad_type == QuadratureType.NO_SINGULARITY:
             _, w = trapezoidal_quadrature(
                 n,
-                t_start=t_start_quadrature_ - t_start_,
+                t_start=t_start_sol_ - t_start_,
                 xp=xp,
                 device=device,
                 dtype=dtype,
@@ -256,7 +256,7 @@ def nystrom_lhs(
             _, w = log_cot_power_quadrature(
                 n,
                 order,
-                t_start=t_start_quadrature_ - t_start_,
+                t_start=t_start_sol_ - t_start_,
                 xp=xp,
                 device=device,
                 dtype=dtype,
@@ -270,7 +270,7 @@ def nystrom_lhs(
             _, w = cot_power_quadrature(
                 n,
                 order,
-                t_start=t_start_quadrature_ - t_start_,
+                t_start=t_start_sol_ - t_start_,
                 xp=xp,
                 device=device,
                 dtype=dtype,
@@ -365,7 +365,7 @@ def nystrom(
     xp: ArrayNamespaceFull,
     device: Any,
     dtype: Any,
-    t_start_quadrature: float | None = None,
+    t_start_sol: float | None = None,
     t_start_factor_quadrature: float | None = None,
     t_start: float | None = None,
     t_start_factor: float | None = None,
@@ -405,7 +405,7 @@ def nystrom(
         The device.
     dtype : Any
         The dtype.
-    t_start_quadrature : float | None
+    t_start_sol : float | None
         Grid shift $t_\mathrm{start}$.
         Applied to column points.
     t_start_factor_quadrature : float | None
@@ -434,7 +434,7 @@ def nystrom(
         xp=xp,
         device=device,
         dtype=dtype,
-        t_start_quadrature=t_start_quadrature,
+        t_start_sol=t_start_sol,
         t_start_factor_quadrature=t_start_factor_quadrature,
         t_start=t_start,
         t_start_factor=t_start_factor,
@@ -447,7 +447,7 @@ def nystrom(
     # (*B, Q, C)
     sol = btensorsolve(A, b, num_batch_axes=B_ndim)
     # Solution is evaluated at
-    # trapezoidal_quadrature(t_start_quadrature)
+    # trapezoidal_quadrature(t_start_sol)
     # , not t_start
 
     class _Interpolant:
@@ -460,7 +460,7 @@ def nystrom(
             basis_x = trapezoidal_basis(
                 x,
                 n=n,
-                t_start=t_start_quadrature,
+                t_start=t_start_sol,
                 t_start_factor=t_start_factor_quadrature,
                 xp=xp,
                 device=device,
