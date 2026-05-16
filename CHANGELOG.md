@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.2.2 (2026-05-16)
+
+### Bug fixes
+
+- Fix wrong moveaxis, `t_start`, `t_start_sol` ([`773fa86`](https://github.com/ultrasphere-dev/ie-circle/commit/773fa8612aa6ca9ae56d153739d4d63760a4a76e))
+
 ## v0.2.1 (2026-05-16)
 
 ### Bug fixes
