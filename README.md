@@ -44,7 +44,9 @@ Solve linear integral equations with singular kernels on circles, optionally wit
 
 Install this via pip (or your favourite package manager):
 
-`pip install ie-circle`
+```shell
+pip install ie-circle
+```
 
 ## Contributors ✨
 
