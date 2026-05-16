@@ -298,10 +298,10 @@ def nystrom_lhs(
     A_terms = xp.broadcast_arrays(*A_terms)
     # (Q(x), Q(y), *B, C(x), C(y))
     A = xp.sum(xp.stack(A_terms, axis=0), axis=0)
-    # -> (Q(y), *B, Q(x), C(x), C(y))
+    # (Q(x), Q(y), *B, C(x), C(y)) -> (Q(y), *B, Q(x), C(x), C(y))
     A = xp.moveaxis(A, 0, -3)
-    # -> (*B, Q(x), C(x), Q(y), C(y))
-    A = xp.moveaxis(A, 1, -2)
+    # (Q(y), *B, Q(x), C(x), C(y)) -> (*B, Q(x), C(x), Q(y), C(y))
+    A = xp.moveaxis(A, 0, -2)
     return A
 
 
