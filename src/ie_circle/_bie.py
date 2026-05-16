@@ -128,7 +128,7 @@ def nystrom_lhs(
     device: Any,
     dtype: Any,
     t_start_sol: float | None = None,
-    t_start_factor_quadrature: float | None = None,
+    t_start_factor_sol: float | None = None,
     t_start: float | None = None,
     t_start_factor: float | None = None,
 ) -> Array:
@@ -173,7 +173,7 @@ def nystrom_lhs(
     t_start_sol : float | None
         Grid shift $t_\mathrm{start}$.
         Applied to column points.
-    t_start_factor_quadrature : float | None
+    t_start_factor_sol : float | None
         Grid shift as a multiple of $h = 2\pi/(2n-1)$.
         Applied to column points.
     t_start : float | None
@@ -197,9 +197,9 @@ def nystrom_lhs(
     t_start_sol_ = _resolve_t_start(
         n,
         t_start=t_start_sol,
-        t_start_factor=t_start_factor_quadrature,
+        t_start_factor=t_start_factor_sol,
     )
-    del t_start, t_start_factor, t_start_sol, t_start_factor_quadrature
+    del t_start, t_start_factor, t_start_sol, t_start_factor_sol
     x, _ = trapezoidal_quadrature(n, t_start=t_start_, xp=xp, device=device, dtype=dtype)
     y, _ = trapezoidal_quadrature(n, t_start=t_start_sol_, xp=xp, device=device, dtype=dtype)
     # if not xp.all(xpx.isclose(x, y)):
@@ -366,7 +366,7 @@ def nystrom(
     device: Any,
     dtype: Any,
     t_start_sol: float | None = None,
-    t_start_factor_quadrature: float | None = None,
+    t_start_factor_sol: float | None = None,
     t_start: float | None = None,
     t_start_factor: float | None = None,
 ) -> NystromInterpolant:
@@ -408,7 +408,7 @@ def nystrom(
     t_start_sol : float | None
         Grid shift $t_\mathrm{start}$.
         Applied to column points.
-    t_start_factor_quadrature : float | None
+    t_start_factor_sol : float | None
         Grid shift as a multiple of $h = 2\pi/(2n-1)$.
         Applied to column points.
     t_start : float | None
@@ -435,7 +435,7 @@ def nystrom(
         device=device,
         dtype=dtype,
         t_start_sol=t_start_sol,
-        t_start_factor_quadrature=t_start_factor_quadrature,
+        t_start_factor_sol=t_start_factor_sol,
         t_start=t_start,
         t_start_factor=t_start_factor,
     )
@@ -461,7 +461,7 @@ def nystrom(
                 x,
                 n=n,
                 t_start=t_start_sol,
-                t_start_factor=t_start_factor_quadrature,
+                t_start_factor=t_start_factor_sol,
                 xp=xp,
                 device=device,
                 dtype=dtype,
