@@ -35,8 +35,8 @@ def example_13_19(
     xp: ArrayNamespaceFull,
     device: Any = None,
     dtype: Any = None,
-    t_start_quadrature: float | None = None,
-    t_start_factor_quadrature: float | None = None,
+    t_start_sol: float | None = None,
+    t_start_factor_sol: float | None = None,
     t_start: float | None = None,
     t_start_factor: float | None = None,
 ) -> NystromInterpolant:
@@ -80,10 +80,10 @@ def example_13_19(
         The device.
     dtype : Any, optional
         The dtype.
-    t_start_quadrature : float | None
+    t_start_sol : float | None
         Grid shift $t_\mathrm{start}$.
         Applied to column points.
-    t_start_factor_quadrature : float | None
+    t_start_factor_sol : float | None
         Grid shift as a multiple of $h = 2\pi/(2n-1)$.
         Applied to column points.
     t_start : float | None
@@ -137,8 +137,8 @@ def example_13_19(
         xp=xp,
         device=device,
         dtype=dtype,
-        t_start_quadrature=t_start_quadrature,
-        t_start_factor_quadrature=t_start_factor_quadrature,
+        t_start_sol=t_start_sol,
+        t_start_factor_sol=t_start_factor_sol,
         t_start=t_start,
         t_start_factor=t_start_factor,
     )
@@ -151,8 +151,8 @@ def example_simple(
     xp: ArrayNamespaceFull,
     device: Any = None,
     dtype: Any = None,
-    t_start_quadrature: float | None = None,
-    t_start_factor_quadrature: float | None = None,
+    t_start_sol: float | None = None,
+    t_start_factor_sol: float | None = None,
     t_start: float | None = None,
     t_start_factor: float | None = None,
 ) -> NystromInterpolant:
@@ -179,10 +179,10 @@ def example_simple(
         The device.
     dtype : Any, optional
         The dtype.
-    t_start_quadrature : float | None
+    t_start_sol : float | None
         Grid shift $t_\mathrm{start}$.
         Applied to column points.
-    t_start_factor_quadrature : float | None
+    t_start_factor_sol : float | None
         Grid shift as a multiple of $h = 2\pi/(2n-1)$.
         Applied to column points.
     t_start : float | None
@@ -220,8 +220,8 @@ def example_simple(
         xp=xp,
         device=device,
         dtype=dtype,
-        t_start_quadrature=t_start_quadrature,
-        t_start_factor_quadrature=t_start_factor_quadrature,
+        t_start_sol=t_start_sol,
+        t_start_factor_sol=t_start_factor_sol,
         t_start=t_start,
         t_start_factor=t_start_factor,
     )
@@ -274,8 +274,8 @@ def example_13_23(
     xp: ArrayNamespaceFull,
     device: Any = None,
     dtype: Any = None,
-    t_start_quadrature: float | None = None,
-    t_start_factor_quadrature: float | None = None,
+    t_start_sol: float | None = None,
+    t_start_factor_sol: float | None = None,
     t_start: float | None = None,
     t_start_factor: float | None = None,
 ) -> NystromInterpolant:
@@ -328,10 +328,10 @@ def example_13_23(
         The device.
     dtype : Any, optional
         The dtype.
-    t_start_quadrature : float | None
+    t_start_sol : float | None
         Grid shift $t_\mathrm{start}$.
         Applied to column points.
-    t_start_factor_quadrature : float | None
+    t_start_factor_sol : float | None
         Grid shift as a multiple of $h = 2\pi/(2n-1)$.
         Applied to column points.
     t_start : float | None
@@ -382,8 +382,8 @@ def example_13_23(
         xp=xp,
         device=device,
         dtype=dtype,
-        t_start_quadrature=t_start_quadrature,
-        t_start_factor_quadrature=t_start_factor_quadrature,
+        t_start_sol=t_start_sol,
+        t_start_factor_sol=t_start_factor_sol,
         t_start=t_start,
         t_start_factor=t_start_factor,
     )

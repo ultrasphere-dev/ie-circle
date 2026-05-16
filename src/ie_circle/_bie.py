@@ -1,13 +1,14 @@
 from enum import StrEnum
 from typing import Any, Protocol
 
-import array_api_extra as xpx
 from array_api._2024_12 import Array, ArrayNamespaceFull
 from array_api_compat import array_namespace
 from array_api_shape_check import check_shapes
 from batch_tensorsolve import btensorsolve
 
+from ._basis import trapezoidal_basis
 from ._quadrature import (
+    _resolve_t_start,
     cot_power_quadrature,
     log_cot_power_quadrature,
     trapezoidal_quadrature,
@@ -126,8 +127,8 @@ def nystrom_lhs(
     xp: ArrayNamespaceFull,
     device: Any,
     dtype: Any,
-    t_start_quadrature: float | None = None,
-    t_start_factor_quadrature: float | None = None,
+    t_start_sol: float | None = None,
+    t_start_factor_sol: float | None = None,
     t_start: float | None = None,
     t_start_factor: float | None = None,
 ) -> Array:
@@ -169,10 +170,10 @@ def nystrom_lhs(
         The device.
     dtype : Any
         The dtype.
-    t_start_quadrature : float | None
+    t_start_sol : float | None
         Grid shift $t_\mathrm{start}$.
         Applied to column points.
-    t_start_factor_quadrature : float | None
+    t_start_factor_sol : float | None
         Grid shift as a multiple of $h = 2\pi/(2n-1)$.
         Applied to column points.
     t_start : float | None
@@ -188,52 +189,64 @@ def nystrom_lhs(
         The left-hand side matrix $A$ of shape (...(B), Q(x), C(x), Q(y), C(y)).
 
     """
-    x, _ = trapezoidal_quadrature(
-        n, t_start=t_start, t_start_factor=t_start_factor, xp=xp, device=device, dtype=dtype
-    )
-    y, _ = trapezoidal_quadrature(
+    t_start_ = _resolve_t_start(
         n,
-        t_start=t_start_quadrature,
-        t_start_factor=t_start_factor_quadrature,
-        xp=xp,
-        device=device,
-        dtype=dtype,
+        t_start=t_start,
+        t_start_factor=t_start_factor,
     )
-    if not xp.all(xpx.isclose(x, y)):
-        raise NotImplementedError(
-            "Currently only supports the case where row and column points are the same."
-        )
+    t_start_sol_ = _resolve_t_start(
+        n,
+        t_start=t_start_sol,
+        t_start_factor=t_start_factor_sol,
+    )
+    del t_start, t_start_factor, t_start_sol, t_start_factor_sol
+    x, _ = trapezoidal_quadrature(n, t_start=t_start_, xp=xp, device=device, dtype=dtype)
+    y, _ = trapezoidal_quadrature(n, t_start=t_start_sol_, xp=xp, device=device, dtype=dtype)
+    # if not xp.all(xpx.isclose(x, y)):
+    #     raise NotImplementedError(
+    #         "Currently only supports the case where row and column points are the same."
+    #     )
     n_quad = 2 * n - 1
     # Singular qudarature rule should be generated for each singular point y.
     # However, since if "roll" (minus) the quadrature along the y axis,
     # the quadrature rule for y=0 can be reused.
+    # -> y
     # S R1 R2 R3 ...
     # R-1 S R1 R2 ...
     # R-2 R-1 S R1 ...
     idx_roll = (
-        xp.arange(n_quad, device=device, dtype=xp.int64)[:, None]
-        - xp.arange(n_quad, device=device, dtype=xp.int64)[None, :]
+        -xp.arange(n_quad, device=device, dtype=xp.int64)[:, None]
+        + xp.arange(n_quad, device=device, dtype=xp.int64)[None, :]
     ) % n_quad
 
+    # Evaluated at x
     # (n_quad, *B, C)
     a_vals = a(x)
+
+    # Q(x), *B, C
     info_a = check_shapes("Q*BC", a_vals, names="a_vals")
     B_shape = info_a.unique["B"].shape_broadcasted
     B_ndim = len(B_shape)
     C = info_a.unique["C"].shape_broadcasted[-1]
-    a_vals_expanded = (
-        a_vals[:, None, ..., :, None]
-        * xp.eye(n_quad)[(...,) + (None,) * (B_ndim + 2)]
-        * xp.eye(C)[(None,) * (B_ndim + 2) + (...,)]
-    )
 
-    A_terms = [a_vals_expanded]
+    # (Q(x), Q(y), *B, C(x), C(y))
+    a_vals = a_vals[:, None, ..., :, None] * xp.eye(C, device=device, dtype=dtype)
+    basis_y_at_x = trapezoidal_basis(
+        x,
+        n=n,
+        t_start=t_start_sol_,
+        xp=xp,
+        device=device,
+        dtype=dtype,
+    )[:, :, None, None]
+    a_mat = a_vals * basis_y_at_x
+
+    A_terms = [a_mat]
     for (quad_type, order), kernel in kernels.items():
         if quad_type == QuadratureType.NO_SINGULARITY:
             _, w = trapezoidal_quadrature(
                 n,
-                t_start=t_start_quadrature,
-                t_start_factor=t_start_factor_quadrature,
+                t_start=t_start_sol_ - t_start_,
                 xp=xp,
                 device=device,
                 dtype=dtype,
@@ -243,8 +256,7 @@ def nystrom_lhs(
             _, w = log_cot_power_quadrature(
                 n,
                 order,
-                t_start=t_start_quadrature,
-                t_start_factor=t_start_factor_quadrature,
+                t_start=t_start_sol_ - t_start_,
                 xp=xp,
                 device=device,
                 dtype=dtype,
@@ -258,8 +270,7 @@ def nystrom_lhs(
             _, w = cot_power_quadrature(
                 n,
                 order,
-                t_start=t_start_quadrature,
-                t_start_factor=t_start_factor_quadrature,
+                t_start=t_start_sol_ - t_start_,
                 xp=xp,
                 device=device,
                 dtype=dtype,
@@ -287,10 +298,10 @@ def nystrom_lhs(
     A_terms = xp.broadcast_arrays(*A_terms)
     # (Q(x), Q(y), *B, C(x), C(y))
     A = xp.sum(xp.stack(A_terms, axis=0), axis=0)
-    # -> (Q(y), *B, Q(x), C(x), C(y))
+    # (Q(x), Q(y), *B, C(x), C(y)) -> (Q(y), *B, Q(x), C(x), C(y))
     A = xp.moveaxis(A, 0, -3)
-    # -> (*B, Q(x), C(x), Q(y), C(y))
-    A = xp.moveaxis(A, 1, -2)
+    # (Q(y), *B, Q(x), C(x), C(y)) -> (*B, Q(x), C(x), Q(y), C(y))
+    A = xp.moveaxis(A, 0, -2)
     return A
 
 
@@ -344,57 +355,6 @@ def nystrom_rhs(
     return b
 
 
-def trapezoidal_basis(
-    x: Array,
-    /,
-    *,
-    t_start: float | None = None,
-    t_start_factor: float | None = None,
-    n: int,
-    xp: ArrayNamespaceFull,
-    device: Any,
-    dtype: Any,
-) -> Array:
-    r"""
-    Evaluates the basis.
-
-    $
-    1/N' \sum_(\abs(m) < N) exp(-im(t_j + t_\mathrm{start})) * exp(imx)
-    $
-
-    Parameters
-    ----------
-    x : Array
-        The points to evaluate of shape (...,).
-    n : int
-        The maximum order - 1.
-    t_start : float | None
-        Grid shift $t_\mathrm{start}$.
-    t_start_factor : float | None
-        Grid shift as a multiple of $h = 2\pi/(2n-1)$.
-    xp : ArrayNamespaceFull
-        The array namespace.
-    device : Any
-        The device.
-    dtype : Any
-        The dtype.
-
-    Returns
-    -------
-    Array
-        The basis evaluated at x of shape (..., n).
-
-    """
-    t, _ = trapezoidal_quadrature(
-        n, xp=xp, device=device, dtype=dtype, t_start=t_start, t_start_factor=t_start_factor
-    )
-    n_quad = 2 * n - 1
-    m = xp.arange(-(n - 1), n, device=device)
-    return (
-        1 / n_quad * xp.sum(xp.exp(-1j * m[None, :] * (t[:, None] - x[..., None, None])), axis=-1)
-    )
-
-
 def nystrom(
     a: ArrayFunction,
     kernels: Kernels,
@@ -405,8 +365,8 @@ def nystrom(
     xp: ArrayNamespaceFull,
     device: Any,
     dtype: Any,
-    t_start_quadrature: float | None = None,
-    t_start_factor_quadrature: float | None = None,
+    t_start_sol: float | None = None,
+    t_start_factor_sol: float | None = None,
     t_start: float | None = None,
     t_start_factor: float | None = None,
 ) -> NystromInterpolant:
@@ -445,10 +405,10 @@ def nystrom(
         The device.
     dtype : Any
         The dtype.
-    t_start_quadrature : float | None
+    t_start_sol : float | None
         Grid shift $t_\mathrm{start}$.
         Applied to column points.
-    t_start_factor_quadrature : float | None
+    t_start_factor_sol : float | None
         Grid shift as a multiple of $h = 2\pi/(2n-1)$.
         Applied to column points.
     t_start : float | None
@@ -474,8 +434,8 @@ def nystrom(
         xp=xp,
         device=device,
         dtype=dtype,
-        t_start_quadrature=t_start_quadrature,
-        t_start_factor_quadrature=t_start_factor_quadrature,
+        t_start_sol=t_start_sol,
+        t_start_factor_sol=t_start_factor_sol,
         t_start=t_start,
         t_start_factor=t_start_factor,
     )
@@ -486,6 +446,9 @@ def nystrom(
     B_ndim = len(info.unique["B"].shape_broadcasted)
     # (*B, Q, C)
     sol = btensorsolve(A, b, num_batch_axes=B_ndim)
+    # Solution is evaluated at
+    # trapezoidal_quadrature(t_start_sol)
+    # , not t_start
 
     class _Interpolant:
         def __init__(self, sol_values: Array) -> None:
@@ -497,8 +460,8 @@ def nystrom(
             basis_x = trapezoidal_basis(
                 x,
                 n=n,
-                t_start=t_start,
-                t_start_factor=t_start_factor,
+                t_start=t_start_sol,
+                t_start_factor=t_start_factor_sol,
                 xp=xp,
                 device=device,
                 dtype=dtype,

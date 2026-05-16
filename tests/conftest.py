@@ -51,11 +51,11 @@ def dtype(request: pytest.FixtureRequest, xp: ArrayNamespaceFull) -> str:
     return getattr(xp, request.param)
 
 
-@pytest.fixture(scope="session", params=[(0.0,)])
+@pytest.fixture(scope="session", params=((0.0,), (0.3,)))
 def t_start_factor(request: pytest.FixtureRequest) -> float:
     return request.param[0]
 
 
-@pytest.fixture(scope="session", params=[(0.0,)])
-def t_start_factor_quadrature(request: pytest.FixtureRequest) -> float:
+@pytest.fixture(scope="session", params=((0.0,), (0.3,)))
+def t_start_factor_sol(request: pytest.FixtureRequest) -> float:
     return request.param[0]

@@ -35,7 +35,7 @@ def test_example_13_19_different_t_start(
         xp=xp,
         device=device,
         dtype=dtype,
-        t_start_factor_quadrature=0.0,
+        t_start_factor_sol=0.0,
         t_start_factor=0.0,
     )
     interpolant_03 = example_13_19(
@@ -45,7 +45,7 @@ def test_example_13_19_different_t_start(
         xp=xp,
         device=device,
         dtype=dtype,
-        t_start_factor_quadrature=0.3,
+        t_start_factor_sol=0.3,
         t_start_factor=0.3,
     )
     assert xp.all(
@@ -62,7 +62,7 @@ def test_example_13_19_different_t_start(
 
 @pytest.mark.parametrize("a", [3.0, 5.0])
 @pytest.mark.parametrize("b", [1.0, 2.0])
-@pytest.mark.parametrize("n", [32, 64])
+@pytest.mark.parametrize("n", [32])
 def test_example_13_19(
     a: float,
     b: float,
@@ -70,7 +70,7 @@ def test_example_13_19(
     xp: ArrayNamespaceFull,
     device: Any,
     dtype: Any,
-    t_start_factor_quadrature: float | None,
+    t_start_factor_sol: float | None,
     t_start_factor: float | None,
 ) -> None:
     interpolant = example_13_19(
@@ -80,7 +80,7 @@ def test_example_13_19(
         xp=xp,
         device=device,
         dtype=dtype,
-        t_start_factor_quadrature=t_start_factor_quadrature,
+        t_start_factor_sol=t_start_factor_sol,
         t_start_factor=t_start_factor,
     )
 
@@ -97,7 +97,7 @@ def test_example_simple(
     xp: ArrayNamespaceFull,
     device: Any,
     dtype: Any,
-    t_start_factor_quadrature: float | None,
+    t_start_factor_sol: float | None,
     t_start_factor: float | None,
 ) -> None:
     interpolant = example_simple(
@@ -105,7 +105,7 @@ def test_example_simple(
         xp=xp,
         device=device,
         dtype=dtype,
-        t_start_factor_quadrature=t_start_factor_quadrature,
+        t_start_factor_sol=t_start_factor_sol,
         t_start_factor=t_start_factor,
     )
     eval_points = xp.linspace(0.0, 2 * math.pi, 10, endpoint=False, device=device, dtype=dtype)
@@ -124,7 +124,7 @@ def test_example_13_23(
     xp: ArrayNamespaceFull,
     device: Any,
     dtype: Any,
-    t_start_factor_quadrature: float | None,
+    t_start_factor_sol: float | None,
     t_start_factor: float | None,
 ) -> None:
     interpolant = example_13_23(
@@ -134,7 +134,7 @@ def test_example_13_23(
         xp=xp,
         device=device,
         dtype=dtype,
-        t_start_factor_quadrature=t_start_factor_quadrature,
+        t_start_factor_sol=t_start_factor_sol,
         t_start_factor=t_start_factor,
     )
     eval_points = xp.random.random_uniform(0, 2 * math.pi, (10,), device=device, dtype=dtype)

@@ -162,7 +162,7 @@ The below thorem is used everywhere.
 #lemma[
   $forall N' in NN. t_j := (2 pi j)/N'. forall m in ZZ. forall ts in [0, 2 pi).$
   $
-    (2 pi)/N' sum_(j=0)^(N'-1) e^(i m (t_j - ts)) = cases(2 pi &(m equiv 0 mod N'), 0 &("otherwise"))
+    (2 pi)/N' sum_(j=0)^(N'-1) e^(i m (t_j + ts)) = cases(2 pi &(m equiv 0 mod N'), 0 &("otherwise"))
   $
 ] <fourier-sum>
 #definition[
@@ -179,7 +179,7 @@ The below thorem is used everywhere.
   Let $t_j := (2 pi j)/N'$ for $j = 0, ..., N' - 1$.
   $forall f, g in U_N.$
   $
-    integral_0^(2 pi) f(t) g(t) dd(t) = (2 pi)/N' sum_(j=0)^(N'-1) f(t_j)
+    integral_0^(2 pi) f(t) g(t) dd(t) = (2 pi)/N' sum_(j=0)^(N'-1) f(t_j) g(t_j)
   $
 ] <dft-trapezoidal>
 #proof[
@@ -205,31 +205,36 @@ Now we consider the way to express discrete Fourier expansion of a function in $
 ]
 
 #definition[Lagrange basis][
+  $forall N in NN. N' := 2 N - 1. t_j := (2 pi j)/N'. forall ts in [0, 2 pi).$
   $
     L^ts_j (x) := 1/N' sum_(abs(m) < N) e^(- i m (t_j + ts)) e^(i m x)
   $
 ]
 
-#theorem[
-  $
-    integral_0^(2 pi) L^ts_i (t) overline(L^(ts')_j (t)) dd(t) =
-  $
-]
-#proof[
-  $
-    integral_0^(2 pi) L^ts_i (t) overline(L^(ts')_j (t)) dd(t) &= integral_0^(2 pi) (1/N' sum_(abs(m) < N) e^(- i m (t_i + ts)) e^(i m t)) (1/N' sum_(abs(n) < N) e^(i n (t_j + ts')) e^(- i n t)) dd(t) \
-    &= 1/(N'^2) sum_(abs(m) < N) sum_(abs(n) < N) e^(- i m (t_i + ts)) e^(i n (t_j + ts')) integral_0^(2 pi) e^(i (m - n) t) dd(t) \
-    &= 1/(N'^2) sum_(abs(m) < N) sum_(abs(n) < N) e^(- i m (t_i + ts)) e^(i n (t_j + ts')) delta_(m, n) 2 pi \
-    &=(2 pi)/(N'^2) sum_(abs(m) < N) e^(i m (t_j + ts' - t_i - ts)) \
-  $
-]
+#let ip(x, y) = $lr(chevron.l #x, #y chevron.r)$
+// #theorem[
+//   $forall N in NN. N' := 2 N - 1. forall ts, ts' in [0, 2 pi). forall i, j in {0, ..., N' - 1}. t_i := (2 pi i)/N'. t_j := (2 pi j)/N'.$
+//   $
+//     ip(L^ts_i, L^(ts')_j) = (2 pi)/N'^2 sum_(abs(m) < N) e^(i m (t_j + ts' - t_i - ts))
+//   $
+// ]
+// #proof[
+//   $
+//     ip(L^ts_i, L^(ts')_j) &=
+//     integral_0^(2 pi) L^ts_i (t) overline(L^(ts')_j (t)) dd(t) \
+//     &= integral_0^(2 pi) (1/N' sum_(abs(m) < N) e^(- i m (t_i + ts)) e^(i m t)) (1/N' sum_(abs(n) < N) e^(i n (t_j + ts')) e^(- i n t)) dd(t) \
+//     &= 1/(N'^2) sum_(abs(m) < N) sum_(abs(n) < N) e^(- i m (t_i + ts)) e^(i n (t_j + ts')) integral_0^(2 pi) e^(i (m - n) t) dd(t) \
+//     &= 1/(N'^2) sum_(abs(m) < N) sum_(abs(n) < N) e^(- i m (t_i + ts)) e^(i n (t_j + ts')) delta_(m, n) 2 pi \
+//     &=(2 pi)/(N'^2) sum_(abs(m) < N) e^(i m (t_j + ts' - t_i - ts)) \
+//   $
+// ]
 
 Combining the above lemma with the exact integral values of Fourier basis functions, we can exactly compute the integrals of functions in $U_N$ multiplied by $cot^n (t/2)$ or $log(4 sin^2 (t/2)) cot^n (t/2)$, by using only the values of the function at $ts, ts + (2 pi)/N', ts + (4 pi)/N', ...$.
 
 #theorem[Generalized Garrick--Wittich quadrature for $U_N$][
   $forall n in NN_0. forall N in NN. forall f in U_N. N' := 2 N - 1. t_j := (2 pi j)/N'. forall ts in [0, 2 pi).$
   $
-    integral.dash_0^(2 pi) f(t) cot^n (t/2) dd(t) = sum_(j=0)^(N'-1) f(t_j + ts) P_j^(N',n)
+    integral.dash_0^(2 pi) f(t) cot^n (t/2) dd(t) = sum_(j=0)^(N'-1) f(t_j + ts) P_j^(N',n,ts)
   $
   $
     P_j^(N',n,ts) := 1/N' sum_(abs(m) < N) I_(m,n) e^(- i m (t_j + ts))
@@ -238,7 +243,7 @@ Combining the above lemma with the exact integral values of Fourier basis functi
 #theorem[Generalized Kussmaul--Martensen (Kress) quadrature for $U_N$][
   $forall n in NN_0. forall N in NN. forall f in U_N. N' := 2 N - 1. t_j := (2 pi j)/N'. forall ts in [0, 2 pi).$
   $
-    integral.dash_0^(2 pi) f(t) log(4 sin^2 (t/2)) cot^n (t/2) dd(t) = sum_(j=0)^(N'-1) f(t_j + ts) Q_j^(N',n)
+    integral.dash_0^(2 pi) f(t) log(4 sin^2 (t/2)) cot^n (t/2) dd(t) = sum_(j=0)^(N'-1) f(t_j + ts) Q_j^(N',n,ts)
   $
   $
     Q_j^(N',n,ts) := 1/N' sum_(abs(m) < N) J_(m,n) e^(- i m (t_j + ts))
@@ -248,6 +253,28 @@ Combining the above lemma with the exact integral values of Fourier basis functi
 == Error estimates
 
 = Integral Equations
+
+#lemma[
+  $forall n in NN. forall N in NN. N' := 2 N - 1. t_j := (2 pi j)/N'. forall ts in [0, 2 pi).$
+  $
+    integral.dash_0^(2 pi) K(x, y) cot^n ((x - y)/2) dd(y) approx (-1)^n sum_(j = 0)^(N'-1) K(x, t_j + ts) P_j^(N',n,(ts - x))
+  $
+]
+#proof[
+  $
+    integral.dash_0^(2 pi) K(x, y) cot^n ((x - y)/2) dd(y)
+    &= (-1)^n integral.dash_0^(2 pi) K(x, y) cot^n ((y - x)/2) dd(y) \
+    &= (-1)^n integral.dash_0^(2 pi) K(x, t + x) cot^n (t/2) dd(t) \
+    &approx (-1)^n sum_(j = 0)^(N'-1) K(x, t_j + ts) P_j^(N',n,(ts - x)) \
+  $
+]
+
+#lemma[
+  $forall n in NN. forall N in NN. N' := 2 N - 1. forall j in NN_0. t_j := (2 pi j)/N'. forall ts, ts' in [0, 2 pi).$
+  $
+    integral.dash_0^(2 pi) K(t_i + ts, y) phi(y) cot^n ((t_i + ts - y)/2) dd(y) approx (-1)^n sum_(j = 0)^(N'-1) K(t_i + ts, t_j + ts') phi(t_j + ts') P_(j-i)^(N',n,(ts' - ts))
+  $
+]
 
 #let binv = $B^("inv")$
 #theorem[
@@ -267,31 +294,64 @@ Combining the above lemma with the exact integral values of Fourier basis functi
   $
 ]
 
+#let dphi = $tilde(phi)^((N))$
 #theorem[
   Let $phi$ solution of
   $
-    phi(s) + sum_(n = 0)^M integral.dash_0^(2 pi) K_n (s, t) cot^n ((s - t)/2) phi(t) dd(t) + sum_(n = 0)^M integral.dash_0^(2 pi) L_n (s, t) log(4 sin^2 ((s - t)/2)) cot^n ((s - t)/2) phi(t) dd(t) = f(s)
+    phi(s) + sum_(n = 0)^M integral.dash_0^(2 pi) K_n (s, t) cot^n ((s - t)/2) phi(t) dd(t) \
+    + sum_(n = 0)^M integral.dash_0^(2 pi) L_n (s, t) log(4 sin^2 ((s - t)/2)) cot^n ((s - t)/2) phi(t) dd(t) = f(s)
   $ <ie-original>
-  and $phi' in U_N$ solution of
+  and $dphi in U_N$ solution of
   $
-    phi(s) + I_N sum_(n = 0)^M integral.dash_0^(2 pi) K_n (s, t) cot^n ((s - t)/2) phi(t) dd(t) + I_N sum_(n = 0)^M integral.dash_0^(2 pi) L_n (s, t) log(4 sin^2 ((s - t)/2)) cot^n ((s - t)/2) phi(t) dd(t) = I_N f(s)
+    dphi(s) + I_N sum_(n = 0)^M integral.dash_0^(2 pi) K_n (s, t) cot^n ((s - t)/2) dphi(t) dd(t) \
+    + I_N sum_(n = 0)^M integral.dash_0^(2 pi) L_n (s, t) log(4 sin^2 ((s - t)/2)) cot^n ((s - t)/2) dphi(t) dd(t) = I_N f(s)
   $ <ie-interpolated>
   assume that @ie-original is solvable. Then
   + $exists N_s in NN. norm(T - A) < norm(T^(-1))^(-1)$
   + $forall N_s ["satisfies above condition"]. forall N >= N_s.$@ie-interpolated has a unique solution
 ]
 
+#proof[
+  WIP
+]
+
+// #definition[
+//   $
+//   A_n := phi|-> integral.dash_0^(2 pi) K_n (s, t) cot^n ((s - t)/2) phi(t) dd(t) \
+//   B_n := phi |-> integral.dash_0^(2 pi) L_n (s, t) log(4 sin^2 ((s - t)/2)) cot^n ((s - t)/2) phi(t) dd(t)
+//   $
+// ]
+
+// #theorem[
+//   $forall K_n in C^infinity (CC^2)$.
+//   $norm(A_n - I_N A_n) <=$
+// ]
+// #proof[
+//   $
+//   (A)
+//   $
+// ]
+
+// #theorem[
+//   $norm(phi - dphi) <=$
+// ]
+
 #theorem[
+  Let ${dphi_j}_(j = 0)^(N'-1)$ solution of
   $
-    phi(t_j + ts) + sum_(n = 0)^M sum_(k=0)^(N'-1) K_n (t_j + ts, t_k + ts') P_j^(N',n,ts') phi(t_k + ts') \
-    + sum_(n = 0)^M sum_(k=0)^(N'-1) L_n (t_j + ts, t_k + ts') Q_j^(N',n,ts') phi(t_k + ts') = f(t_j + ts)
+    sum_(j = 0)^(N'-1) L_j^(ts')(t_i + ts) dphi_j + sum_(n = 0)^M (-1)^n sum_(j=0)^(N'-1) K_n (t_i + ts, t_j + ts') P_j^(N',n,ts') dphi_j \
+    + sum_(n = 0)^M (-1)^n sum_(j=0)^(N'-1) L_n (t_i + ts, t_j + ts') Q_j^(N',n,ts') dphi_j = f(t_i + ts)
+  $
+  Then
+  $
+    dphi (x) = sum_(j = 0)^(N'-1) dphi_j L^ts'_j (x)
   $
 ]
 #proof[
-
+  Evaluate @ie-interpolated at $t_i + ts$.
   $
-    phi(t_j + ts) + sum_(n = 0)^M sum_(k=0)^(N'-1) K_n (t_j + ts, t_k + ts') P_j^(N',n,ts') phi(t_k + ts') \
-    + sum_(n = 0)^M sum_(k=0)^(N'-1) L_n (t_j + ts, t_k + ts') Q_j^(N',n,ts') phi(t_k + ts') = f(t_j + ts)
+    sum_(j = 0)^(N' - 1) L_j^(ts')(t_i + ts) dphi_j + sum_(n = 0)^M sum_(j=0)^(N'-1) K_n (t_i + ts, t_j + ts') P_(j-i)^(N',n,ts'-ts) dphi_j \
+    + sum_(n = 0)^M (-1)^n sum_(j=0)^(N'-1) L_n (t_i + ts, t_j + ts') Q_(j-i)^(N',n,ts'-ts) dphi_j = f(t_i + ts)
   $
 ]
 

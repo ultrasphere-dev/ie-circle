@@ -1,6 +1,23 @@
 __version__ = "0.2.1"
-from ._bie import nystrom, nystrom_lhs, nystrom_rhs
-from ._example import example_13_19, example_13_19_answer
+from ._basis import trapezoidal_basis
+from ._bie import (
+    ArrayFunction,
+    KernelFunction,
+    Kernels,
+    NystromInterpolant,
+    QuadratureType,
+    nystrom,
+    nystrom_lhs,
+    nystrom_rhs,
+)
+from ._example import (
+    example_13_19,
+    example_13_19_answer,
+    example_13_23,
+    example_13_23_answer,
+    example_simple,
+    example_simple_answer,
+)
 from ._fourier_integral import (
     cot_power_fourier_integral_coefficients,
     harmonic_number,
@@ -20,16 +37,27 @@ from ._quadrature import (
 from ._shape import CircleShape, KressShape, Shape, SympyShape
 
 __all__ = [
+    "ArrayFunction",
     "CircleShape",
+    "KernelFunction",
+    "Kernels",
     "KressShape",
+    "NystromInterpolant",
     "PowerQuadratureRule",
     "QuadratureRule",
+    "QuadratureType",
     "Shape",
     "SympyShape",
     "cot_power_fourier_integral_coefficients",
     "cot_power_quadrature",
     "example_13_19",
+    "example_13_19",
     "example_13_19_answer",
+    "example_13_19_answer",
+    "example_13_23",
+    "example_13_23_answer",
+    "example_simple",
+    "example_simple_answer",
     "fourier_coeff_to_quadrature",
     "garrick_wittich_quadrature",
     "harmonic_number",
@@ -41,5 +69,6 @@ __all__ = [
     "nystrom_lhs",
     "nystrom_rhs",
     "shift_quadrature_singularity",
+    "trapezoidal_basis",
     "trapezoidal_quadrature",
 ]
