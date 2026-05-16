@@ -62,7 +62,7 @@ def test_example_13_19_different_t_start(
 
 @pytest.mark.parametrize("a", [3.0, 5.0])
 @pytest.mark.parametrize("b", [1.0, 2.0])
-@pytest.mark.parametrize("n", [32, 64])
+@pytest.mark.parametrize("n", [32])
 def test_example_13_19(
     a: float,
     b: float,

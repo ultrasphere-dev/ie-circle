@@ -162,7 +162,7 @@ The below thorem is used everywhere.
 #lemma[
   $forall N' in NN. t_j := (2 pi j)/N'. forall m in ZZ. forall ts in [0, 2 pi).$
   $
-    (2 pi)/N' sum_(j=0)^(N'-1) e^(i m (t_j - ts)) = cases(2 pi &(m equiv 0 mod N'), 0 &("otherwise"))
+    (2 pi)/N' sum_(j=0)^(N'-1) e^(i m (t_j + ts)) = cases(2 pi &(m equiv 0 mod N'), 0 &("otherwise"))
   $
 ] <fourier-sum>
 #definition[
@@ -179,7 +179,7 @@ The below thorem is used everywhere.
   Let $t_j := (2 pi j)/N'$ for $j = 0, ..., N' - 1$.
   $forall f, g in U_N.$
   $
-    integral_0^(2 pi) f(t) g(t) dd(t) = (2 pi)/N' sum_(j=0)^(N'-1) f(t_j)
+    integral_0^(2 pi) f(t) g(t) dd(t) = (2 pi)/N' sum_(j=0)^(N'-1) f(t_j) g(t_j)
   $
 ] <dft-trapezoidal>
 #proof[
@@ -234,7 +234,7 @@ Combining the above lemma with the exact integral values of Fourier basis functi
 #theorem[Generalized Garrick--Wittich quadrature for $U_N$][
   $forall n in NN_0. forall N in NN. forall f in U_N. N' := 2 N - 1. t_j := (2 pi j)/N'. forall ts in [0, 2 pi).$
   $
-    integral.dash_0^(2 pi) f(t) cot^n (t/2) dd(t) = sum_(j=0)^(N'-1) f(t_j + ts) P_j^(N',n)
+    integral.dash_0^(2 pi) f(t) cot^n (t/2) dd(t) = sum_(j=0)^(N'-1) f(t_j + ts) P_j^(N',n,ts)
   $
   $
     P_j^(N',n,ts) := 1/N' sum_(abs(m) < N) I_(m,n) e^(- i m (t_j + ts))
@@ -243,7 +243,7 @@ Combining the above lemma with the exact integral values of Fourier basis functi
 #theorem[Generalized Kussmaul--Martensen (Kress) quadrature for $U_N$][
   $forall n in NN_0. forall N in NN. forall f in U_N. N' := 2 N - 1. t_j := (2 pi j)/N'. forall ts in [0, 2 pi).$
   $
-    integral.dash_0^(2 pi) f(t) log(4 sin^2 (t/2)) cot^n (t/2) dd(t) = sum_(j=0)^(N'-1) f(t_j + ts) Q_j^(N',n)
+    integral.dash_0^(2 pi) f(t) log(4 sin^2 (t/2)) cot^n (t/2) dd(t) = sum_(j=0)^(N'-1) f(t_j + ts) Q_j^(N',n,ts)
   $
   $
     Q_j^(N',n,ts) := 1/N' sum_(abs(m) < N) J_(m,n) e^(- i m (t_j + ts))
@@ -253,6 +253,28 @@ Combining the above lemma with the exact integral values of Fourier basis functi
 == Error estimates
 
 = Integral Equations
+
+#lemma[
+  $forall n in NN. forall N in NN. N' := 2 N - 1. t_j := (2 pi j)/N'. forall ts in [0, 2 pi).$
+  $
+    integral.dash_0^(2 pi) K(x, y) cot^n ((x - y)/2) dd(y) approx (-1)^n sum_(j = 0)^(N'-1) K(x, t_j + ts) P_j^(N',n,(ts - x))
+  $
+]
+#proof[
+  $
+    integral.dash_0^(2 pi) K(x, y) cot^n ((x - y)/2) dd(y)
+    &= (-1)^n integral.dash_0^(2 pi) K(x, y) cot^n ((y - x)/2) dd(y) \
+    &= (-1)^n integral.dash_0^(2 pi) K(x, t + x) cot^n (t/2) dd(t) \
+    &approx (-1)^n sum_(j = 0)^(N'-1) K(x, t_j + ts) P_j^(N',n,(ts - x)) \
+  $
+]
+
+#lemma[
+  $forall n in NN. forall N in NN. N' := 2 N - 1. forall j in NN_0. t_j := (2 pi j)/N'. forall ts, ts' in [0, 2 pi).$
+  $
+    integral.dash_0^(2 pi) K(t_i + ts, y) phi(y) cot^n ((t_i + ts - y)/2) dd(y) approx (-1)^n sum_(j = 0)^(N'-1) K(t_i + ts, t_j + ts') phi(t_j + ts') P_(j-i)^(N',n,(ts' - ts))
+  $
+]
 
 #let binv = $B^("inv")$
 #theorem[
@@ -292,19 +314,19 @@ Combining the above lemma with the exact integral values of Fourier basis functi
 #theorem[
   Let ${dphi_j}_(j = 0)^(N'-1)$ solution of
   $
-    sum_(j = 0)^(N'-1) L_j^(ts')(t_i + ts) dphi_j + sum_(n = 0)^M sum_(j=0)^(N'-1) K_n (t_i + ts, t_j + ts') P_j^(N',n,ts') dphi_j \
-    + sum_(n = 0)^M sum_(j=0)^(N'-1) L_n (t_i + ts, t_j + ts') Q_j^(N',n,ts') dphi_j = f(t_i + ts)
+    sum_(j = 0)^(N'-1) L_j^(ts')(t_i + ts) dphi_j + sum_(n = 0)^M (-1)^n sum_(j=0)^(N'-1) K_n (t_i + ts, t_j + ts') P_j^(N',n,ts') dphi_j \
+    + sum_(n = 0)^M (-1)^n sum_(j=0)^(N'-1) L_n (t_i + ts, t_j + ts') Q_j^(N',n,ts') dphi_j = f(t_i + ts)
   $
   Then
   $
-    dphi = sum_(j = 0)^(N'-1) dphi_j L^ts'_j
+    dphi (x) = sum_(j = 0)^(N'-1) dphi_j L^ts'_j (x)
   $
 ]
 #proof[
   Evaluate @ie-interpolated at $s = t_i + ts$.
   $
-    sum_(j = 0)^(N' - 1) L_j^(ts')(t_i + ts) dphi_j + sum_(n = 0)^M sum_(j=0)^(N'-1) K_n (t_i + ts, t_j + ts') P_j^(N',n,ts') dphi_j \
-    + sum_(n = 0)^M sum_(j=0)^(N'-1) L_n (t_i + ts, t_j + ts') Q_j^(N',n,ts') dphi_j = f(t_i + ts)
+    sum_(j = 0)^(N' - 1) L_j^(ts')(t_i + ts) dphi_j + sum_(n = 0)^M sum_(j=0)^(N'-1) K_n (t_i + ts, t_j + ts') P_(j-i)^(N',n,ts'-ts) dphi_j \
+    + sum_(n = 0)^M (-1)^n sum_(j=0)^(N'-1) L_n (t_i + ts, t_j + ts') Q_(j-i)^(N',n,ts'-ts) dphi_j = f(t_i + ts)
   $
 ]
 

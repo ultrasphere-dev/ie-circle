@@ -10,7 +10,14 @@ from ._bie import (
     nystrom_lhs,
     nystrom_rhs,
 )
-from ._example import example_13_19, example_13_19_answer
+from ._example import (
+    example_13_19,
+    example_13_19_answer,
+    example_13_23,
+    example_13_23_answer,
+    example_simple,
+    example_simple_answer,
+)
 from ._fourier_integral import (
     cot_power_fourier_integral_coefficients,
     harmonic_number,
@@ -44,7 +51,13 @@ __all__ = [
     "cot_power_fourier_integral_coefficients",
     "cot_power_quadrature",
     "example_13_19",
+    "example_13_19",
     "example_13_19_answer",
+    "example_13_19_answer",
+    "example_13_23",
+    "example_13_23_answer",
+    "example_simple",
+    "example_simple_answer",
     "fourier_coeff_to_quadrature",
     "garrick_wittich_quadrature",
     "harmonic_number",
