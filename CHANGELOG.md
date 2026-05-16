@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.2.1 (2026-05-16)
+
+### Bug fixes
+
+- Fix wrong sign and quadrature rolling in nystrom_lhs ([`13d371b`](https://github.com/ultrasphere-dev/ie-circle/commit/13d371bcafc1fa940686c0c87dc1470f4c1f07c6))
+
 ## v0.2.0 (2026-05-13)
 
 ### Features

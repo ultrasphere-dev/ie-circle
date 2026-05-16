@@ -15,7 +15,7 @@ from sphinx.ext import apidoc
 project = "ie-circle"
 copyright = "2025, 34j"
 author = "34j"
-release = "0.2.0"
+release = "0.2.1"
 
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
