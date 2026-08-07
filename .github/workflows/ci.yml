@@ -14,7 +14,7 @@ jobs:
   lint:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6.0.2
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
       - uses: astral-sh/setup-uv@v8.1.0
       - uses: j178/prek-action@v2.0.3
 
@@ -24,7 +24,7 @@ jobs:
     name: Lint Commit Messages
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6.0.2
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
         with:
           fetch-depth: 0
       - uses: wagoid/commitlint-github-action@v6.2.1
@@ -43,7 +43,7 @@ jobs:
           - macOS-latest
     runs-on: ${{ matrix.os }}
     steps:
-      - uses: actions/checkout@v6.0.2
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
       - uses: astral-sh/setup-uv@v8.1.0
         with:
           python-version: ${{ matrix.python-version }}
@@ -70,7 +70,7 @@ jobs:
       contents: write
 
     steps:
-      - uses: actions/checkout@v6.0.2
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
         with:
           fetch-depth: 0
           ref: ${{ github.sha }}
