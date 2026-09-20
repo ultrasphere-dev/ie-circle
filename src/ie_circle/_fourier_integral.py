@@ -2,9 +2,10 @@ from __future__ import annotations
 
 import warnings
 from functools import cache
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
-from array_api._2024_12 import Array, ArrayNamespaceFull
+if TYPE_CHECKING:
+    from array_api._2024_12 import Array, ArrayNamespaceFull
 
 
 @cache
@@ -170,10 +171,18 @@ def log_cot_power_fourier_integral_coefficients(
     j_nm2 = j0
     j_nm1 = j1
     i_nm2 = cot_power_fourier_integral_coefficients(
-        n_harmonics, 0, xp=xp, device=device, dtype=dtype
+        n_harmonics,
+        0,
+        xp=xp,
+        device=device,
+        dtype=dtype,
     )
     i_nm1 = cot_power_fourier_integral_coefficients(
-        n_harmonics, 1, xp=xp, device=device, dtype=dtype
+        n_harmonics,
+        1,
+        xp=xp,
+        device=device,
+        dtype=dtype,
     )
 
     for k in range(2, power + 1):

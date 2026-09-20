@@ -82,10 +82,10 @@ def run_apidoc(_: Any) -> None:
             "-o",
             docs_path.as_posix(),
             module_path.as_posix(),
-        ]
+        ],
     )
 
 
 def setup(app: Sphinx) -> None:
-    """Setup sphinx."""
+    """Set up Sphinx."""
     app.connect("builder-inited", run_apidoc)

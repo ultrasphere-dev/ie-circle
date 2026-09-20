@@ -133,7 +133,7 @@ def nystrom_lhs(
     t_start_factor: float | None = None,
 ) -> Array:
     r"""
-    Returns the left-hand side matrix $A$ of the Nystrom method for the integral equation.
+    Return the left-hand side matrix $A$ of the Nystrom method for the integral equation.
 
     $$
     a(x) \phi (x)
@@ -301,8 +301,7 @@ def nystrom_lhs(
     # (Q(x), Q(y), *B, C(x), C(y)) -> (Q(y), *B, Q(x), C(x), C(y))
     A = xp.moveaxis(A, 0, -3)
     # (Q(y), *B, Q(x), C(x), C(y)) -> (*B, Q(x), C(x), Q(y), C(y))
-    A = xp.moveaxis(A, 0, -2)
-    return A
+    return xp.moveaxis(A, 0, -2)
 
 
 def nystrom_rhs(
@@ -316,7 +315,7 @@ def nystrom_rhs(
     t_start_factor: float | None = None,
 ) -> Array:
     r"""
-    Returns the quadrature nodes and right-hand side vector.
+    Return the quadrature nodes and right-hand side vector.
 
     Parameters
     ----------
@@ -347,12 +346,16 @@ def nystrom_rhs(
 
     """
     x, _ = trapezoidal_quadrature(
-        n, xp=xp, device=device, dtype=dtype, t_start=t_start, t_start_factor=t_start_factor
+        n,
+        xp=xp,
+        device=device,
+        dtype=dtype,
+        t_start=t_start,
+        t_start_factor=t_start_factor,
     )
     # (Q, *B, C)
     b = rhs(x)
-    b = xp.moveaxis(b, 0, -2)
-    return b
+    return xp.moveaxis(b, 0, -2)
 
 
 def nystrom(
@@ -440,7 +443,13 @@ def nystrom(
         t_start_factor=t_start_factor,
     )
     b = nystrom_rhs(
-        rhs, n=n, xp=xp, device=device, dtype=dtype, t_start=t_start, t_start_factor=t_start_factor
+        rhs,
+        n=n,
+        xp=xp,
+        device=device,
+        dtype=dtype,
+        t_start=t_start,
+        t_start_factor=t_start_factor,
     )
     info = check_shapes("*BQCQC,*BQC", A, b)
     B_ndim = len(info.unique["B"].shape_broadcasted)

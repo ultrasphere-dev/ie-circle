@@ -58,28 +58,22 @@ docs = [
 [tool.ruff]
 line-length = 100
 lint.select = [
-  "B",   # flake8-bugbear
-  "C4",  # flake8-comprehensions
-  "D",   # flake8-docstrings
-  "E",   # pycodestyle
-  "F",   # pyflake
-  "I",   # isort
-  "RUF", # ruff specific
-  "S",   # flake8-bandit
-  "UP",  # pyupgrade
-  "W",   # pycodestyle
+  "ALL",
 ]
 lint.ignore = [
-  "D100", # Missing docstring in public module
-  "D104", # Missing docstring in public package
-  "D107", # Missing docstring in `__init__`
-  "D203", # 1 blank line required before class docstring
+  "ANN",
+  "ARG",
+  "COM812",
+  "D203",
   "D205",
-  "D212", # Multi-line docstring summary should start at the first line
-  "D401", # First line of docstring should be in imperative mood
+  "D212",
+  "ERA",
+  "N",
+  "PLC0415",
+  "PLR",
 ]
 lint.per-file-ignores."conftest.py" = [ "D100" ]
-lint.per-file-ignores."docs/conf.py" = [ "D100" ]
+lint.per-file-ignores."docs/conf.py" = [ "A001", "D100", "INP001" ]
 lint.per-file-ignores."setup.py" = [ "D100" ]
 lint.per-file-ignores."tests/**/*" = [
   "D100",

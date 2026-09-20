@@ -19,7 +19,7 @@ def trapezoidal_basis(
     dtype: Any,
 ) -> Array:
     r"""
-    Evaluates the basis.
+    Evaluate the basis.
 
     $
     1/N' \sum_(\abs(m) < N) exp(-im(t_j + t_\mathrm{start})) * exp(imx)
@@ -49,7 +49,12 @@ def trapezoidal_basis(
 
     """
     t, _ = trapezoidal_quadrature(
-        n, xp=xp, device=device, dtype=dtype, t_start=t_start, t_start_factor=t_start_factor
+        n,
+        xp=xp,
+        device=device,
+        dtype=dtype,
+        t_start=t_start,
+        t_start_factor=t_start_factor,
     )
     n_quad = 2 * n - 1
     m = xp.arange(-(n - 1), n, device=device)

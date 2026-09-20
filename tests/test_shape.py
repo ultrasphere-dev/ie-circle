@@ -6,7 +6,7 @@ from ie_circle._shape import CircleShape, KressShape, SympyShape
 
 
 @pytest.mark.parametrize(
-    "shape_cls, sympy_args, shape_args",
+    ("shape_cls", "sympy_args", "shape_args"),
     [
         (
             CircleShape,
@@ -23,7 +23,7 @@ from ie_circle._shape import CircleShape, KressShape, SympyShape
         ),
     ],
 )
-def test_sympy_shape_consistency(shape_cls, sympy_args, shape_args):
+def test_sympy_shape_consistency(shape_cls, sympy_args, shape_args) -> None:
     # Setup SympyShape
     t_sym = sympy.Symbol("t")
     x_expr, y_expr = sympy_args(t_sym)

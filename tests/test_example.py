@@ -53,10 +53,10 @@ def test_example_13_19_different_t_start(
             interpolant_0(
                 trapezoidal_quadrature(n, xp=xp, device=device, dtype=dtype, t_start_factor=0.3)[0][
                     :3
-                ]
+                ],
             ),
             interpolant_03.sol[:3],
-        )
+        ),
     )
 
 

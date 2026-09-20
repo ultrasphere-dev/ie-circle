@@ -32,7 +32,8 @@ def xp(request: pytest.FixtureRequest) -> ArrayNamespaceFull:
         xp.random.random_uniform = random_uniform
         xp.random.integers = integers
     else:
-        raise ValueError(f"Unknown backend: {backend}")
+        msg = f"Unknown backend: {backend}"
+        raise ValueError(msg)
     return xp
 
 
@@ -41,7 +42,7 @@ def device(request: pytest.FixtureRequest, xp: ArrayNamespaceFull) -> Any:
     device = request.param
     try:
         _ = xp.asarray(1, device=device)
-    except Exception:
+    except Exception:  # noqa: BLE001
         pytest.skip(f"{device=} is not available")
     return device
 

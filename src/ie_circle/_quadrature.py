@@ -1,14 +1,15 @@
 from __future__ import annotations
 
 import math
-from typing import Any, Protocol, overload
-
-from array_api._2024_12 import Array, ArrayNamespaceFull
+from typing import TYPE_CHECKING, Any, Protocol, overload
 
 from ._fourier_integral import (
     cot_power_fourier_integral_coefficients,
     log_cot_power_fourier_integral_coefficients,
 )
+
+if TYPE_CHECKING:
+    from array_api._2024_12 import Array, ArrayNamespaceFull
 
 
 class QuadratureRule(Protocol):
@@ -152,7 +153,9 @@ def shift_quadrature_singularity(
         t_start = kwargs.pop("t_start", None)
         t_start_factor = kwargs.pop("t_start_factor", None)
         resolved_t_start = _resolve_t_start(
-            n_harmonics, t_start=t_start, t_start_factor=t_start_factor
+            n_harmonics,
+            t_start=t_start,
+            t_start_factor=t_start_factor,
         )
         nodes, weights = quadrature(
             *args,
@@ -336,7 +339,11 @@ def cot_power_quadrature(
 
     """
     coeff = cot_power_fourier_integral_coefficients(
-        n_harmonics, power, xp=xp, device=device, dtype=dtype
+        n_harmonics,
+        power,
+        xp=xp,
+        device=device,
+        dtype=dtype,
     )
     return fourier_coeff_to_quadrature(
         coeff,
@@ -409,7 +416,11 @@ def log_cot_power_quadrature(
 
     """
     coeff = log_cot_power_fourier_integral_coefficients(
-        n_harmonics, power, xp=xp, device=device, dtype=dtype
+        n_harmonics,
+        power,
+        xp=xp,
+        device=device,
+        dtype=dtype,
     )
     return fourier_coeff_to_quadrature(
         coeff,

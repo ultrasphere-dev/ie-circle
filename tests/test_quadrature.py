@@ -13,11 +13,19 @@ from ie_circle._quadrature import (
 
 @pytest.mark.parametrize("f_case", ["one", "exp1", "combo"])
 def test_kussmaul_martensen_kress_quadrature_exactness(
-    xp: Any, device: Any, dtype: Any, t_start_factor: float, f_case: str
+    xp: Any,
+    device: Any,
+    dtype: Any,
+    t_start_factor: float,
+    f_case: str,
 ) -> None:
     n = 6
     t, w = kussmaul_martensen_kress_quadrature(
-        n, t_start_factor=t_start_factor, xp=xp, device=device, dtype=dtype
+        n,
+        t_start_factor=t_start_factor,
+        xp=xp,
+        device=device,
+        dtype=dtype,
     )
     two_pi = xp.pi * 2
 
@@ -39,11 +47,19 @@ def test_kussmaul_martensen_kress_quadrature_exactness(
 
 @pytest.mark.parametrize("f_case", ["one", "exp1", "combo"])
 def test_garrick_wittich_quadrature_exactness(
-    xp: Any, device: Any, dtype: Any, t_start_factor: float, f_case: str
+    xp: Any,
+    device: Any,
+    dtype: Any,
+    t_start_factor: float,
+    f_case: str,
 ) -> None:
     n = 6
     t, w = garrick_wittich_quadrature(
-        n, t_start_factor=t_start_factor, xp=xp, device=device, dtype=dtype
+        n,
+        t_start_factor=t_start_factor,
+        xp=xp,
+        device=device,
+        dtype=dtype,
     )
     two_pi = xp.pi * 2
 
@@ -65,11 +81,19 @@ def test_garrick_wittich_quadrature_exactness(
 
 @pytest.mark.parametrize("f_case", ["one", "exp1", "combo"])
 def test_trapezoidal_quadrature_exactness(
-    xp: Any, device: Any, dtype: Any, t_start_factor: float, f_case: str
+    xp: Any,
+    device: Any,
+    dtype: Any,
+    t_start_factor: float,
+    f_case: str,
 ) -> None:
     n = 6
     t, w = trapezoidal_quadrature(
-        n, t_start_factor=t_start_factor, xp=xp, device=device, dtype=dtype
+        n,
+        t_start_factor=t_start_factor,
+        xp=xp,
+        device=device,
+        dtype=dtype,
     )
     two_pi = xp.pi * 2
 

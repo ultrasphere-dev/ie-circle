@@ -9,7 +9,7 @@ from ._bie import NystromInterpolant, QuadratureType, nystrom
 
 def example_13_19_answer(t: Array, /) -> Array:
     r"""
-    Returns the exact solution of the example integral equation.
+    Return the exact solution of the example integral equation.
 
     Parameters
     ----------
@@ -229,7 +229,7 @@ def example_simple(
 
 def example_simple_answer(t: Array, /) -> Array:
     r"""
-    Returns the exact solution of the simple test integral equation.
+    Return the exact solution of the simple test integral equation.
 
     Parameters
     ----------
@@ -248,7 +248,7 @@ def example_simple_answer(t: Array, /) -> Array:
 
 def example_13_23_answer(t: Array, /) -> Array:
     r"""
-    Returns the exact solution of the example 13.23 integral equation.
+    Return the exact solution of the example 13.23 integral equation.
 
     Parameters
     ----------

@@ -20,7 +20,12 @@ def test_trapezoidal_basis(
         0
     ]
     actual = trapezoidal_basis(
-        x, n=n, xp=xp, device=device, dtype=dtype, t_start_factor=t_start_factor
+        x,
+        n=n,
+        xp=xp,
+        device=device,
+        dtype=dtype,
+        t_start_factor=t_start_factor,
     )
     expected = xp.eye(2 * n - 1, device=device, dtype=xp.result_type(dtype, 1j))
     assert actual.shape == (2 * n - 1, 2 * n - 1)
