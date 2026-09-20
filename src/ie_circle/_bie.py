@@ -469,6 +469,6 @@ def nystrom(
             # (..., *B, Q, C)
             basis_x = basis_x[(...,) + (None,) * B_ndim + (slice(None), None)]
             check_shapes("...*BQC,*BQC", basis_x, self.sol, names="basis_x,sol")
-            return xp.sum(self.sol * basis_x, axis=(-1, -2))
+            return xp.sum(self.sol * basis_x, axis=-2)
 
     return _Interpolant(sol)

@@ -87,7 +87,7 @@ def test_example_13_19(
     eval_points = xp.random.random_uniform(0, 2 * math.pi, (10,), device=device, dtype=dtype)
 
     expected = xp.astype(example_13_19_answer(eval_points), xp.result_type(dtype, 1j))
-    actual = interpolant(eval_points)
+    actual = xp.squeeze(interpolant(eval_points), axis=-1)
     assert xp.all(xpx.isclose(actual, expected))
 
 
@@ -110,7 +110,7 @@ def test_example_simple(
     )
     eval_points = xp.linspace(0.0, 2 * math.pi, 10, endpoint=False, device=device, dtype=dtype)
     expected = xp.astype(example_simple_answer(eval_points), xp.result_type(dtype, 1j))
-    actual = interpolant(eval_points)
+    actual = xp.squeeze(interpolant(eval_points), axis=-1)
     assert xp.all(xpx.isclose(actual, expected))
 
 
@@ -139,5 +139,5 @@ def test_example_13_23(
     )
     eval_points = xp.random.random_uniform(0, 2 * math.pi, (10,), device=device, dtype=dtype)
     expected = xp.astype(example_13_23_answer(eval_points), xp.result_type(dtype, 1j))
-    actual = interpolant(eval_points)
+    actual = xp.squeeze(interpolant(eval_points), axis=-1)
     assert xp.all(xpx.isclose(actual, expected))
