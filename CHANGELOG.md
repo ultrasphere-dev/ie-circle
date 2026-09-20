@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.2.3 (2026-09-20)
+
+### Bug fixes
+
+- Do not sum up in `_iterpolant.__call__()` ([`0db07eb`](https://github.com/ultrasphere-dev/ie-circle/commit/0db07eb48293a40877c88c07e6695310e784714c))
+
 ## v0.2.2 (2026-05-16)
 
 ### Bug fixes
