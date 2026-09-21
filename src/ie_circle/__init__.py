@@ -36,7 +36,7 @@ from ._quadrature import (
     shift_quadrature_singularity,
     trapezoidal_quadrature,
 )
-from ._shape import CircleShape, KressShape, Shape, SympyShape
+from ._shape import CircleShape, KressShape, Shape, ShapeList, Shapes, SympyShape
 
 __all__ = [
     "ArrayFunction",
@@ -49,6 +49,8 @@ __all__ = [
     "QuadratureRule",
     "QuadratureType",
     "Shape",
+    "ShapeList",
+    "Shapes",
     "SympyShape",
     "cot_power_fourier_integral_coefficients",
     "cot_power_quadrature",

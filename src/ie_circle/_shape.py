@@ -1,4 +1,4 @@
-from collections.abc import Callable
+from collections.abc import Callable, Sequence
 from typing import Any, Protocol
 
 import attrs
@@ -15,9 +15,60 @@ class Shape(Protocol):
     def ddx(self, t: Array, /) -> Array: ...
 
 
-def jacobian(shape: Shape, t: Array, /) -> Array:
+class Shapes(Protocol):
+    """
+    Batch of shapes for multi-scatterer problems.
+
+    Methods return arrays with an extra ``n_shapes`` dimension:
+    ``x(t)`` has shape ``(..., n_shapes, 2)``.
+    """
+
+    @property
+    def n_shapes(self) -> int: ...
+
+    def __len__(self) -> int: ...
+
+    def __getitem__(self, idx: int) -> Shape: ...
+
+    def x(self, t: Array, /) -> Array: ...
+
+    def dx(self, t: Array, /) -> Array: ...
+
+    def ddx(self, t: Array, /) -> Array: ...
+
+
+@attrs.define(frozen=True)
+class ShapeList:
+    """Wrap a sequence of :class:`Shape` into a :class:`Shapes`."""
+
+    _shapes: Sequence[Shape]
+
+    @property
+    def n_shapes(self) -> int:
+        return len(self._shapes)
+
+    def __len__(self) -> int:
+        return len(self._shapes)
+
+    def __getitem__(self, idx: int) -> Shape:
+        return self._shapes[idx]
+
+    def x(self, t: Array, /) -> Array:
+        xp = array_namespace(t)
+        return xp.stack([s.x(t) for s in self._shapes], axis=-2)
+
+    def dx(self, t: Array, /) -> Array:
+        xp = array_namespace(t)
+        return xp.stack([s.dx(t) for s in self._shapes], axis=-2)
+
+    def ddx(self, t: Array, /) -> Array:
+        xp = array_namespace(t)
+        return xp.stack([s.ddx(t) for s in self._shapes], axis=-2)
+
+
+def jacobian(shapes: Shapes, t: Array, /) -> Array:
     xp = array_namespace(t)
-    return xp.sqrt(xp.sum(shape.dx(t) ** 2, axis=-1))
+    return xp.sqrt(xp.sum(shapes.dx(t) ** 2, axis=-1))
 
 
 @attrs.define(frozen=True)
