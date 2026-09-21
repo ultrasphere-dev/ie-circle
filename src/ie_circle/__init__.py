@@ -1,6 +1,6 @@
 """Solve linear integral equations with singular kernels on circles."""
 
-__version__ = "0.2.3"
+__version__ = "0.3.0"
 from ._basis import trapezoidal_basis
 from ._bie import (
     ArrayFunction,

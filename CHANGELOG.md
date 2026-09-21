@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.3.0 (2026-09-21)
+
+### Features
+
+- Add `shapes` ([`6588c31`](https://github.com/ultrasphere-dev/ie-circle/commit/6588c31a1ef7480527cfb99565004e6fab1098d0))
+
 ## v0.2.3 (2026-09-20)
 
 ### Bug fixes
