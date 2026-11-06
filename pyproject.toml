@@ -40,19 +40,13 @@ urls.repository = "https://github.com/ultrasphere-dev/ie-circle"
 [dependency-groups]
 dev = [
   "coverage",
-  "pytest==9.*",
-  "pytest-cov==7.*",
+  "packaging-34j[test]",
   "pytest-xdist>=3.8",
-  "sybil[pytest]",
   "torch>=2.11",
   "ty>=0.0.34",
 ]
 docs = [
-  "furo; python_version>='3.12'",
-  "myst-parser; python_version>='3.12'",
-  "sphinx==9.*; python_version>='3.12'",
-  "sphinx-autobuild; python_version>='3.12'",
-  "sphinx-math-dollar>=1.3",
+  "packaging-34j[docs]",
 ]
 
 [tool.ruff]
@@ -122,7 +116,6 @@ allow_zero_version = true
 version_toml = [ "pyproject.toml:project.version" ]
 version_variables = [
   "src/ie_circle/__init__.py:__version__",
-  "docs/conf.py:release",
 ]
 build_command = """
 pip install uv
