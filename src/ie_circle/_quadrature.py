@@ -9,7 +9,7 @@ from ._fourier_integral import (
 )
 
 if TYPE_CHECKING:
-    from array_api._2024_12 import Array, ArrayNamespaceFull
+    from array_api.latest import Array, ArrayNamespaceFull
 
 
 class QuadratureRule(Protocol):

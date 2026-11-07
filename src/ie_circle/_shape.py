@@ -3,7 +3,7 @@ from typing import Any, Protocol
 
 import attrs
 import sympy
-from array_api._2024_12 import Array
+from array_api.latest import Array
 from array_api_compat import array_namespace
 
 

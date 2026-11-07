@@ -1,7 +1,7 @@
 from typing import Any
 
 import pytest
-from array_api._2024_12 import ArrayNamespaceFull
+from array_api.latest import ArrayNamespaceFull
 
 
 @pytest.fixture(scope="session", params=["numpy"])
