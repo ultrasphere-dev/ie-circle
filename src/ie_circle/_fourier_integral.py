@@ -5,7 +5,7 @@ from functools import cache
 from typing import TYPE_CHECKING, Any
 
 if TYPE_CHECKING:
-    from array_api._2024_12 import Array, ArrayNamespaceFull
+    from array_api.latest import Array, ArrayNamespaceFull
 
 
 @cache

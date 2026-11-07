@@ -1,7 +1,7 @@
 from enum import StrEnum
 from typing import Any, Protocol
 
-from array_api._2024_12 import Array, ArrayNamespaceFull
+from array_api.latest import Array, ArrayNamespaceFull
 from array_api_compat import array_namespace
 from array_api_shape_check import check_shapes
 from batch_tensorsolve import btensorsolve

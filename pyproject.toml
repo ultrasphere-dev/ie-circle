@@ -9,7 +9,7 @@ description = "Solve linear integral equations with singular kernels on circles,
 readme = "README.md"
 license = "MIT"
 authors = [
-  { name = "34j", email = "34j.95a2p@simplelogin.com" },
+  { name = "34j" },
 ]
 requires-python = ">=3.12"
 classifiers = [
@@ -40,107 +40,19 @@ urls.repository = "https://github.com/ultrasphere-dev/ie-circle"
 [dependency-groups]
 dev = [
   "coverage",
-  "pytest==9.*",
-  "pytest-cov==7.*",
+  "packaging-34j[test]",
   "pytest-xdist>=3.8",
-  "sybil[pytest]",
   "torch>=2.11",
   "ty>=0.0.34",
 ]
 docs = [
-  "furo; python_version>='3.12'",
-  "myst-parser; python_version>='3.12'",
-  "sphinx==9.*; python_version>='3.12'",
-  "sphinx-autobuild; python_version>='3.12'",
-  "sphinx-math-dollar>=1.3",
+  "packaging-34j[docs]",
 ]
 
 [tool.ruff]
-line-length = 100
-lint.select = [
-  "ALL",
-]
-lint.ignore = [
-  "ANN",
-  "ARG",
-  "COM812",
-  "D203",
-  "D205",
-  "D212",
-  "ERA",
-  "N",
-  "PLC0415",
-  "PLR",
-]
-lint.per-file-ignores."conftest.py" = [ "D100" ]
-lint.per-file-ignores."docs/conf.py" = [ "A001", "D100", "INP001" ]
-lint.per-file-ignores."setup.py" = [ "D100" ]
-lint.per-file-ignores."tests/**/*" = [
-  "D100",
-  "D101",
-  "D102",
-  "D103",
-  "D104",
-  "S101",
-]
-lint.isort.known-first-party = [ "ie_circle", "tests" ]
+extend = ".venv/ruff.toml"
+lint.extend-ignore = [ "D205", "DOC201", "DOC501", "N", "PLC0415", "PLR6301" ]
+lint.extend-per-file-ignores."tests/**/*" = [ "PLC2701" ]
 
 [tool.pyproject-fmt]
 max_supported_python = "3.14"
-
-[tool.ty]
-terminal.error-on-warning = true
-
-[tool.pytest]
-minversion = "9.0"
-addopts = [
-  "-v",
-  "-Wonce",
-  "-p no:doctest",
-  "--cov=ie_circle",
-  "--cov-report=term",
-  "--cov-report=xml",
-]
-pythonpath = [ "src" ]
-
-[tool.coverage]
-run.branch = true
-paths.source = [
-  "src",
-  ".tox/**/site-packages",
-]
-report.exclude_lines = [
-  "@overload",
-  'if __name__ == "__main__":',
-  "if TYPE_CHECKING",
-  "pragma: no cover",
-  "raise NotImplementedError",
-]
-
-[tool.semantic_release]
-allow_zero_version = true
-version_toml = [ "pyproject.toml:project.version" ]
-version_variables = [
-  "src/ie_circle/__init__.py:__version__",
-  "docs/conf.py:release",
-]
-build_command = """
-pip install uv
-uv lock
-git add uv.lock
-uv build
-"""
-branches.main.match = "main"
-branches.noop.match = "(?!main$)"
-branches.noop.prerelease = true
-changelog.exclude_commit_patterns = [
-  "chore(?:\\([^)]*?\\))?: .+",
-  "ci(?:\\([^)]*?\\))?: .+",
-  "refactor(?:\\([^)]*?\\))?: .+",
-  "style(?:\\([^)]*?\\))?: .+",
-  "test(?:\\([^)]*?\\))?: .+",
-  "build\\((?!deps\\): .+)",
-  "Merged? .*",
-  "Initial [Cc]ommit.*",         # codespell:ignore
-]
-changelog.environment.keep_trailing_newline = true

@@ -1,6 +1,6 @@
 from typing import Any
 
-from array_api._2024_12 import Array, ArrayNamespaceFull
+from array_api.latest import Array, ArrayNamespaceFull
 
 from ._quadrature import (
     trapezoidal_quadrature,

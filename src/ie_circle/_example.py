@@ -1,7 +1,7 @@
 import math
 from typing import Any
 
-from array_api._2024_12 import Array, ArrayNamespaceFull
+from array_api.latest import Array, ArrayNamespaceFull
 from array_api_compat import array_namespace
 
 from ._bie import NystromInterpolant, QuadratureType, nystrom
