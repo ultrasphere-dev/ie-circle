@@ -1,5 +1,5 @@
 #import "@preview/equate:0.3.2": *
-#import "@preview/physica:0.9.7": *
+#import "@preview/physica:0.9.8": *
 #show: equate.with(breakable: true, sub-numbering: true)
 #set math.equation(numbering: "(1.1)")
 #import "@preview/ctheorems:1.1.3": *
