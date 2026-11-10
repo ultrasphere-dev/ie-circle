@@ -238,7 +238,7 @@ def nystrom_lhs(
         xp=xp,
         device=device,
         dtype=dtype,
-    )[:, :, None, None]
+    )[(...,) + (None,) * (B_ndim + 2)]
     a_mat = a_vals * basis_y_at_x
 
     A_terms = [a_mat]
