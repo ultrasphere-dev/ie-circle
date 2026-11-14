@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import math
+from functools import lru_cache
 from typing import TYPE_CHECKING, Any, Protocol, overload
 
 from ._fourier_integral import (
@@ -168,6 +169,7 @@ def shift_quadrature_singularity(
     return wrapped
 
 
+@lru_cache(maxsize=32)
 def trapezoidal_quadrature(
     n: int,
     /,
@@ -180,6 +182,8 @@ def trapezoidal_quadrature(
 ) -> tuple[Array, Array]:
     r"""
     Trapezoidal quadrature for [0, 2π].
+
+    Returned arrays are cached and must not be modified in place.
 
     Returns $x_j$ and $w_j$, where
 
@@ -278,6 +282,7 @@ def fourier_coeff_to_quadrature(
     return t, weights
 
 
+@lru_cache(maxsize=32)
 def cot_power_quadrature(
     n_harmonics: int,
     power: int,
@@ -291,6 +296,8 @@ def cot_power_quadrature(
 ) -> tuple[Array, Array]:
     r"""
     Shifted finite-part trapezoidal rule for $\cot^{\mathrm{power}}(t/2)$.
+
+    Returned arrays are cached and must not be modified in place.
 
     Let $N' := 2 N - 1$ and $t_j := 2\pi j / N'$.
     For $t_s := t_\mathrm{start}$, the rule matches the Typst statement
@@ -356,6 +363,7 @@ def cot_power_quadrature(
     )
 
 
+@lru_cache(maxsize=32)
 def log_cot_power_quadrature(
     n_harmonics: int,
     power: int,
@@ -370,6 +378,8 @@ def log_cot_power_quadrature(
     r"""
     Shifted finite-part trapezoidal rule for
     $\log(4\sin^2(t/2))\,\cot^{\mathrm{power}}(t/2)$.
+
+    Returned arrays are cached and must not be modified in place.
 
     Let $N' := 2 N - 1$ and $t_j := 2\pi j / N'$.
     For $t_s := t_\mathrm{start}$, the rule matches the Typst statement

@@ -264,8 +264,7 @@ def nystrom_lhs(
             # Currently cot^n ((\tau - t)/2)
             # Need to flip to cot^n ((t - \tau)/2)
             # to match the kernel implementation which assumes cot^n ((t - \tau)/2)
-            w *= (-1) ** order
-            w = w[idx_roll]
+            w = w[idx_roll] * (-1) ** order
         elif quad_type == QuadratureType.COT_POWER:
             _, w = cot_power_quadrature(
                 n,
@@ -278,8 +277,7 @@ def nystrom_lhs(
             # Currently \log(4\sin^2((\tau - t)/2))\cot^n ((\tau - t)/2)
             # Need to flip to \log(4\sin^2((t - \tau)/2))\cot^n ((t - \tau)/2)
             # to match the kernel implementation which assumes \log(4\sin^2((t - \tau)/2))
-            w *= (-1) ** order
-            w = w[idx_roll]
+            w = w[idx_roll] * (-1) ** order
         else:
             msg = f"Unsupported quadrature type: {quad_type}"  # type: ignore[unreachable]
             raise ValueError(msg)
