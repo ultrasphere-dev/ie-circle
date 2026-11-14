@@ -42,7 +42,7 @@ dev = [
   "coverage",
   "packaging-34j[test]",
   "pytest-xdist>=3.8",
-  "torch>=2.11",
+  "torch>=2.15.0",
   "ty>=0.0.34",
 ]
 docs = [
