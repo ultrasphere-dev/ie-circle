@@ -2,7 +2,7 @@
 #import "@preview/physica:0.9.8": *
 #show: equate.with(breakable: true, sub-numbering: true)
 #set math.equation(numbering: "(1.1)")
-#import "@preview/ctheorems:1.1.3": *
+#import "@preview/ctheorems:2.0.0": *
 #show: thmrules.with(qed-symbol: $square$)
 #let definition = thmplain("definition", "Definition")
 #let theorem = thmplain("theorem", "Theorem")
