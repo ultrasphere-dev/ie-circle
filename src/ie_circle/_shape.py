@@ -1,4 +1,4 @@
-from collections.abc import Callable, Sequence
+from collections.abc import Callable
 from typing import Any, Protocol
 
 import attrs
@@ -8,27 +8,11 @@ from array_api_compat import array_namespace
 
 
 class Shape(Protocol):
-    def x(self, t: Array, /) -> Array: ...
+    """A one-dimensional batch of parametrized planar boundaries.
 
-    def dx(self, t: Array, /) -> Array: ...
-
-    def ddx(self, t: Array, /) -> Array: ...
-
-
-class Shapes(Protocol):
+    For parameters of shape ``(...)``, each method returns shape ``(..., C, 2)``,
+    where ``C`` is the number of boundaries.
     """
-    Batch of shapes for multi-scatterer problems.
-
-    Methods return arrays with an extra ``n_shapes`` dimension:
-    ``x(t)`` has shape ``(..., n_shapes, 2)``.
-    """
-
-    @property
-    def n_shapes(self) -> int: ...
-
-    def __len__(self) -> int: ...
-
-    def __getitem__(self, idx: int) -> Shape: ...
 
     def x(self, t: Array, /) -> Array: ...
 
@@ -37,38 +21,9 @@ class Shapes(Protocol):
     def ddx(self, t: Array, /) -> Array: ...
 
 
-@attrs.define(frozen=True)
-class ShapeList:
-    """Wrap a sequence of :class:`Shape` into a :class:`Shapes`."""
-
-    _shapes: Sequence[Shape]
-
-    @property
-    def n_shapes(self) -> int:
-        return len(self._shapes)
-
-    def __len__(self) -> int:
-        return len(self._shapes)
-
-    def __getitem__(self, idx: int) -> Shape:
-        return self._shapes[idx]
-
-    def x(self, t: Array, /) -> Array:
-        xp = array_namespace(t)
-        return xp.stack([s.x(t) for s in self._shapes], axis=-2)
-
-    def dx(self, t: Array, /) -> Array:
-        xp = array_namespace(t)
-        return xp.stack([s.dx(t) for s in self._shapes], axis=-2)
-
-    def ddx(self, t: Array, /) -> Array:
-        xp = array_namespace(t)
-        return xp.stack([s.ddx(t) for s in self._shapes], axis=-2)
-
-
-def jacobian(shapes: Shapes, t: Array, /) -> Array:
+def jacobian(shape: Shape, t: Array, /) -> Array:
     xp = array_namespace(t)
-    return xp.sqrt(xp.sum(shapes.dx(t) ** 2, axis=-1))
+    return xp.sqrt(xp.sum(shape.dx(t) ** 2, axis=-1))
 
 
 @attrs.define(frozen=True)
@@ -79,15 +34,15 @@ class CircleShape(Shape):
 
     def x(self, t: Array, /) -> Array:
         xp = array_namespace(t)
-        return xp.stack([self.rho * xp.cos(t), self.rho * xp.sin(t)], axis=-1)
+        return xp.stack([self.rho * xp.cos(t), self.rho * xp.sin(t)], axis=-1)[..., None, :]
 
     def dx(self, t: Array, /) -> Array:
         xp = array_namespace(t)
-        return xp.stack([-self.rho * xp.sin(t), self.rho * xp.cos(t)], axis=-1)
+        return xp.stack([-self.rho * xp.sin(t), self.rho * xp.cos(t)], axis=-1)[..., None, :]
 
     def ddx(self, t: Array, /) -> Array:
         xp = array_namespace(t)
-        return xp.stack([-self.rho * xp.cos(t), -self.rho * xp.sin(t)], axis=-1)
+        return xp.stack([-self.rho * xp.cos(t), -self.rho * xp.sin(t)], axis=-1)[..., None, :]
 
 
 @attrs.define(frozen=True)
@@ -109,21 +64,21 @@ class KressShape(Shape):
         return xp.stack(
             [xp.cos(t) + 0.65 * xp.cos(2 * t) - 0.65, 1.5 * xp.sin(t)],
             axis=-1,
-        )
+        )[..., None, :]
 
     def dx(self, t: Array, /) -> Array:
         xp = array_namespace(t)
         return xp.stack(
             [-xp.sin(t) - 0.65 * 2 * xp.sin(2 * t), 1.5 * xp.cos(t)],
             axis=-1,
-        )
+        )[..., None, :]
 
     def ddx(self, t: Array, /) -> Array:
         xp = array_namespace(t)
         return xp.stack(
             [-xp.cos(t) - 0.65 * 2 * 2 * xp.cos(2 * t), -1.5 * xp.sin(t)],
             axis=-1,
-        )
+        )[..., None, :]
 
 
 @attrs.define(frozen=True)
@@ -177,7 +132,7 @@ class SympyShape(Shape):
             v0 = xp.broadcast_to(v0, t.shape)
         if v1.ndim == 0:
             v1 = xp.broadcast_to(v1, t.shape)
-        return xp.stack([v0, v1], axis=-1)
+        return xp.stack([v0, v1], axis=-1)[..., None, :]
 
     def x(self, t: Array, /) -> Array:
         return self._eval(self._x_func, t)

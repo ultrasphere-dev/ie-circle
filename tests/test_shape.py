@@ -37,6 +37,7 @@ def test_sympy_shape_consistency(shape_cls, sympy_args, shape_args) -> None:
 
     # Compare x
     # pytest.approx handles numpy arrays
+    assert original_shape.x(t_vals).shape == (20, 1, 2)
     assert sympy_shape.x(t_vals) == pytest.approx(original_shape.x(t_vals))
 
     # Compare dx
